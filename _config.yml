@@ -3,9 +3,9 @@ markdown:         kramdown
 highlighter:      rouge
 
 # Setup
-title:            Indo Benchmark
+title:            IndoTutorial
 tagline:          'A Tutorial'
-description:      'The <a href="https://github.com/indobenchmark/indonlu" target="_blank">Hyde</a> tutorial'
+description:      'An easy-to-follow tutorial for <a href="https://pytorch.org/" target="_blank">PyTorch</a> and <a href="https://docusaurus.io/" target="_blank">Docusaurus</a>'
 url:              https://indobenchmark.github.io
 baseurl:          '/tutorials'
                   # the optional subpath of your site, e.g. "/blog"
@@ -15,7 +15,7 @@ baseurl:          '/tutorials'
                   # sidebar_blog_link below.
 
 author:
-  name:           'Indo Benchmark'
+  name:           'IndoBenchmark'
   url:            
 
 paginate:         5
