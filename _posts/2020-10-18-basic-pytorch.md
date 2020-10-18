@@ -3,35 +3,48 @@ layout: post
 title: Introduction to Deep Learning for Natural Language Processing Using PyTorch
 sub_tile: "Beginner"
 categories:
-  - Beginner
-excerpt_separator:  <!--more-->
+  - PyTorch
+  - Deep Learning
+  - NLP
+excerpt_separator: "<!--more-->"
 ---
-<div class="message">
-<img width=50px src="assets/img/lamp.png" style="float:left;margin-right:20px;margin-top:15px"/>
-<div>
+<div class="message" style="background:#eee">
+<img width=50px src="/tutorials/assets/img/lamp.png" style="float:left;margin-right:20px;margin-top:15px"/>
+<div style="color:#555">
 In this tutorial, you will learn on how to implement deep learning models for natural language processing with step-by-step examples that guide you to be a good machine learning engineer. 
 </div>
 </div>
 
-<b>Hello World!</b> This is your first step to learn Natural Language Processing (NLP) by introducing you the world of deep neural networks. Our goal is to enable everyone to be able to use deep learning, no matter if you are a scientist, an engineer, a student, a doctor, or anything else. In this tutorial, we will guide you to go step-by-step with easy-to-follow examples and real data.
+<b>Hello World!</b> This is your first step to learn Natural Language Processing (NLP) in the world of deep neural networks. Our goal is to enable everyone to grasp the knowledge to apply deep learning to NLP, no matter if you are a scientist, an engineer, a student, a doctor, or anything else. In this tutorial, we will guide you to go step-by-step with easy-to-follow examples using real data.
 
+<!--more-->
 
 Let's start with a simple example of predicting emotion. Imagine that we have two sentences:
-<div>
+
+<div class="message" style="padding-bottom:1px;background:#eee">
+<img width=50px src="/tutorials/assets/img/example.png" style="float:left;margin-right:40px;margin-top:8px"/>
+<div style="color:#555">
 <ul>
-<li>I cry because of my cat is sick</li>
+<li>I cry because my cat is sick</li>
 <li>I won a jackpot!</li>
 </ul>
+</div>
 </div>
 
 Can you tell which one expresses ```sadness```? Yes, the ```first``` one. This task is trivial for us, but how can we teach a machine to predict as like humans?
 
 
-### Jumpstart: Natural Language Processing
+### From Rules To Deep Learning Models
 
-In the traditional way of doing NLP, we will go through an abundance of preprocessing pipeline, from tokenization, stemming, normalization, lemmatization, stopword removal, n-gram, bag of word, etc before we can feed the data into the model. But when we go to a deep NLP, all of these pipelined processes are gone. In deep NLP we just need to do tokenization and directly feed the data into the model. Pretty neat right?
+For long decades, practioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry. 
+
+In the traditional way of processing text,
+
+ we will go through an abundant preprocessing pipeline, from tokenization, stemming, normalization, lemmatization, stopword removal, n-gram, bag of word, etc before we can feed the data into the model. But when we go to a deep NLP, all of these pipelined processes are gone. In deep NLP we just need to do tokenization and directly feed the data into the model. Pretty neat, right?
 
 Before we dive into deep learning for NLP, we need to know what deep learning is. So, in short, deep learning is a term to cover multi-layers neural-network-based machine learning algorithms where the model is updated iteratively by applying gradient descent. Each layer on a deep neural network consists of two kind functions that we need to implement before we can use a deep learning model: forward function and backward function. If we have these two functions for all kinds of layers we can then build a deep neural network model, BUT the model will not be able to learn until we define one more function, the loss function. So far, we have identified the three fundamental functions that need to be implemented to build a deep learning model. So, can we build a deep neural network model now? Not yet, there are two problems here. First, there are so many variations for each of these three functions, it will be very time consuming for us to implement it by ourselves, and second, unfortunately... there is a great deal of MATHEMATICAL understanding behind each of them >o< >o< >o< !!!! 
+
+### How to build the model? PyTorch is the answer!
 
 I am not good at math, how can I use deep learning then? :’( :’( :’(
 
