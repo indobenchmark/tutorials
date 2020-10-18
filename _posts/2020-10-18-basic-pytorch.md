@@ -52,7 +52,7 @@ To show the difference between those methods, we will show you back the previous
 </div>
 </div>
 
-By checking the lexical occurences, we can easily fool our model to classify the ```second``` sentence as ```happy``` because it has a phrase ```won the jackpot```. If the model is able to understand completely, then it is easy to notice the meaning of the sentence.
+By checking the lexical occurences, we can easily fool our model to classify the ```second``` sentence as ```happy``` because it has a phrase ```won the jackpot```. If the model is able to understand completely, then it is easy to notice the change of meaning after the clause.
 
 Let's start learning how to build a model using PyTorch.
 
