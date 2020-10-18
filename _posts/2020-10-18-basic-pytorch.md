@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Introduction to Deep Learning for Natural Language Processing Using PyTorch
+title: Deep Learning for Natural Language Processing Using PyTorch
 sub_tile: "Beginner"
 categories:
   - PyTorch
@@ -15,7 +15,7 @@ In this tutorial, you will learn on how to implement deep learning models for na
 </div>
 </div>
 
-<b>Hello World!</b> This is your first step to learn Natural Language Processing (NLP) in the world of deep neural networks. Our goal is to enable everyone to grasp the knowledge to apply deep learning to NLP, no matter if you are a scientist, an engineer, a student, a doctor, or anything else. In this tutorial, we will guide you to go step-by-step with easy-to-follow examples using real data.
+<b>Welcome</b> to the first tutorial on Natural Language Processing (NLP) in the world of deep neural networks. Our goal is to enable everyone to grasp the knowledge in applying deep learning to NLP, no matter if you are a scientist, an engineer, a student, a doctor, or anything else. We will guide you to go step-by-step with easy-to-follow examples using real data.
 
 <!--more-->
 
