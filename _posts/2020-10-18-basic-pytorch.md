@@ -36,7 +36,7 @@ Can you tell which one expresses ```sadness```? Yes, the ```second``` one. This 
 
 ### The Tale of NLP: From Rules to Deep Learning Models
 
-For long decades, practioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry. 
+For long decades, practitioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry. 
 
 A simple naive solution for an NLP application is keyword matching using rules. For example, in emotion classification task, we can collect words that represent happiness, and for sentences with those words, we can classify them as ```happy```. But, is it the best we can do? Instead of checking word by word, we can train a model that accepts a sentence as input and predict them according to the semantic meaning.
 
