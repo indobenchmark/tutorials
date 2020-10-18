@@ -15,7 +15,7 @@ In this tutorial, you will learn on how to implement deep learning models for na
 </div>
 </div>
 
-<b>Welcome</b> to the first tutorial on Natural Language Processing (NLP) in the world of deep neural networks. Our goal is to enable everyone to grasp the knowledge in applying deep learning to NLP, no matter if you are a scientist, an engineer, a student, a doctor, or anything else. We will guide you to go step-by-step with easy-to-follow examples using real data.
+<b>Welcome</b> to the first tutorial on Natural Language Processing (NLP) in the world of deep neural networks. Our goal is to enable everyone to grasp the knowledge in applying deep learning to NLP, no matter if you are a scientist, an engineer, a student, or anything else. We will guide you to go step-by-step with easy-to-follow examples using real data.
 
 <!--more-->
 
@@ -26,7 +26,7 @@ Let's start with a simple example of predicting emotion. Imagine that we have tw
 <div style="color:#555">
 <ul>
 <li>We went to Bali for holiday. It was fantastic!</li>
-<li>My neighbour won the jackpot! not me.</li>
+<li>My neighbour won the jackpot! and it's not me.</li>
 </ul>
 </div>
 </div>
@@ -38,7 +38,7 @@ Can you tell which one expresses ```sadness```? Yes, the ```second``` one. This 
 
 For long decades, practitioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry. 
 
-A simple naive solution for an NLP application is keyword matching using rules. For example, in emotion classification task, we can collect words that represent happiness, and for sentences with those words, we can classify them as ```happy```. But, is it the best we can do? Instead of checking word by word, we can train a model that accepts a sentence as input and predict them according to the semantic meaning.
+A simple naive solution for an NLP application is <b>a keyword matching using rules</b>. For example, in emotion classification task, we can collect words that represent happiness, and for sentences with those words, we can classify them as ```happy```. But, is it the best we can do? Instead of checking word by word, we can train a model that accepts a sentence as input and predicts a label according to the semantic meaning of the input.
 
 To show the difference between those methods, we will show you back the previous example!
 
@@ -47,12 +47,12 @@ To show the difference between those methods, we will show you back the previous
 <div style="color:#555">
 <ul>
 <li>We went to Bali for <b>holiday</b>. It was <b>fantastic!</b></li>
-<li>My neighbour <b>won the jackpot!</b> <b>not me.</b></li>
+<li>My neighbour <b>won the jackpot!</b> and it's <b>not me.</b></li>
 </ul>
 </div>
 </div>
 
-By checking the lexical occurences, we can easily fool our model to classify the ```second``` sentence as ```happy``` because it has a phrase ```won the jackpot```. If the model is able to understand completely, then it is easy to notice the change of meaning after the clause.
+By checking the lexical terms, we can easily fool our model to classify the ```second``` sentence as ```happy``` because it has the ```won the jackpot``` phrase. If the model is able to understand the second sentence completely, then it is easy to notice the change of meaning after the second clause that that person feel sad because they didn't win the jackpot.
 
 Let's start learning how to build a model using PyTorch.
 
