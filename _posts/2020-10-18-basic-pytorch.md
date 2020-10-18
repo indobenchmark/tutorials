@@ -25,18 +25,38 @@ Let's start with a simple example of predicting emotion. Imagine that we have tw
 <img width=50px src="/tutorials/assets/img/example.png" style="float:left;margin-right:40px;margin-top:8px"/>
 <div style="color:#555">
 <ul>
-<li>I cry because my cat is sick</li>
-<li>I won a jackpot!</li>
+<li>We went to Bali for holiday. It was fantastic!</li>
+<li>My neighbour won the jackpot! not me.</li>
 </ul>
 </div>
 </div>
 
-Can you tell which one expresses ```sadness```? Yes, the ```first``` one. This task is trivial for us, but how can we teach a machine to predict as like humans?
+Can you tell which one expresses ```sadness```? Yes, the ```second``` one. This task is trivial for us, but how can we teach a machine to predict as like humans?
 
 
-### From Rules To Deep Learning Models
+### The Tale of NLP: From Rules to Deep Learning Models
 
 For long decades, practioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry. 
+
+A simple naive solution for an NLP application is keyword matching using rules. For example, in emotion classification task, we can collect words that represent happiness, and for sentences with those words, we can classify them as ```happy```. But, is it the best we can do? Instead of checking word by word, we can train a model that accepts a sentence as input and predict them according to the semantic meaning.
+
+To show the difference between those methods, we will show you back the previous example!
+
+<div class="message" style="padding-bottom:1px;background:#eee">
+<img width=50px src="/tutorials/assets/img/example.png" style="float:left;margin-right:40px;margin-top:8px"/>
+<div style="color:#555">
+<ul>
+<li>We went to Bali for <b>holiday</b>. It was <b>fantastic!</b></li>
+<li>My neighbour <b>won the jackpot!</b> <b>not me.</b></li>
+</ul>
+</div>
+</div>
+
+By checking the lexical occurences, we can easily fool our model to classify the ```second``` sentence as ```happy``` because it has a phrase ```won the jackpot```. If the model is able to understand completely, then it is easy to notice the meaning of the sentence.
+
+Let's start learning how to build a model using PyTorch.
+
+### Building a Model Using PyTorch
 
 In the traditional way of processing text,
 
