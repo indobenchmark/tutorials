@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Deep Learning for Natural Language Processing Using PyTorch
+title: Pre-Trained Models for NLP Tasks Using PyTorch
 sub_tile: "Beginner"
 categories:
   - PyTorch
@@ -11,13 +11,27 @@ excerpt_separator: "<!--more-->"
 <div class="message" style="background:#eee">
 <img width=50px src="/tutorials/assets/img/lamp.png" style="float:left;margin-right:20px;margin-top:15px"/>
 <div style="color:#555">
-In this tutorial, you will learn on how to implement deep learning models for natural language processing with step-by-step examples that guide you to be a good machine learning engineer. 
+In this tutorial, you will learn on how to implement deep learning models for natural language processing with step-by-step examples that guide you to be a good machine learning engineer or scientist. 
 </div>
 </div>
 
 <b>Welcome</b> to the first tutorial on Natural Language Processing (NLP) in the world of deep neural networks. Our goal is to enable everyone to grasp the knowledge in applying deep learning to NLP, no matter if you are a scientist, an engineer, a student, or anything else. We will guide you to go step-by-step with easy-to-follow examples using real data.
 
 <!--more-->
+
+<div style="background:#fafafa;padding:10px;padding-top:0.5px;margin-top:0px;padding-bottom:1px;margin-bottom:12px;padding-left:17px;border-color:#dedede;border-style: solid;border-width: 2px;">
+<h3 style="padding:top:1px;margin-top:13px">Outline</h3>
+<ul>
+<li><a href="#sec1">A Brief Background on NLP</a></li>
+<li><a href="#sec2">Building a Model Using PyTorch</a>
+  <ul>
+    <li><a href="#sec2-1">Writing Model</a></li>
+    <li><a href="#basic-concepts">Basic Concepts</a></li>
+    <li>Basic Concepts</li>
+  </ul>
+</li>
+</ul>
+</div>
 
 Let's start with a simple example of predicting emotion. Imagine that we have two sentences:
 
@@ -33,10 +47,11 @@ Let's start with a simple example of predicting emotion. Imagine that we have tw
 
 Can you tell which one expresses ```sadness```? Yes, the ```second``` one. This task is trivial for us, but how can we teach a machine to predict as like humans?
 
+<div id="sec1"></div>
+### A Brief Background on NLP
+#### From Rules to Deep Learning Models
 
-### The Tale of NLP: From Rules to Deep Learning Models
-
-For long decades, practitioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry. 
+For long decades, practitioners in NLP focus on building hand-crafted rules and grammars for each language that are very tedious and labourous until statistical models are applied to NLP. Basically, those models are used to learn a function (or in layman terms, we call it ```mapping```) between input and targets. Then, just recently, deep learning models show a significant progress in NLP, especially when open source deep learning frameworks, such as [PyTorch](https://pytorch.org/) is available for academia and industry.
 
 A simple naive solution for an NLP application is <b>a keyword matching using rules</b>. For example, in emotion classification task, we can collect words that represent happiness, and for sentences with those words, we can classify them as ```happy```. But, is it the best we can do? Instead of checking word by word, we can train a model that accepts a sentence as input and predicts a label according to the semantic meaning of the input.
 
@@ -54,13 +69,96 @@ To show the difference between those methods, we will show you back the previous
 
 By checking the lexical terms, we can easily fool our model to classify the ```second``` sentence as ```happy``` because it has the ```won the jackpot``` phrase. If the model is able to understand the second sentence completely, then it is easy to notice the change of meaning after the second clause that that person feel sad because they didn't win the jackpot.
 
-Let's start learning how to build a model using PyTorch.
+Let's start learning how to build a deep learning model using PyTorch.
 
+<div id="sec2"></div>
 ### Building a Model Using PyTorch
 
-In the traditional way of processing text,
+We show examples to use PyTorch for training a model based on the [IndoNLU project](https://github.com/indobenchmark/indonlu). 
 
- we will go through an abundant preprocessing pipeline, from tokenization, stemming, normalization, lemmatization, stopword removal, n-gram, bag of word, etc before we can feed the data into the model. But when we go to a deep NLP, all of these pipelined processes are gone. In deep NLP we just need to do tokenization and directly feed the data into the model. Pretty neat, right?
+<div id="sec2-1"></div>
+#### Model
+```python
+from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
+
+args = {}
+args["model_checkpoint"] = "indobenchmark/indobert-base-p1"
+
+tokenizer = BertTokenizer.from_pretrained(args['model_checkpoint'])
+config = BertConfig.from_pretrained(args['model_checkpoint'])
+model = BertForSequenceClassification.from_pretrained(args['model_checkpoint'], config=config)
+```
+
+#### Training Step
+```python
+def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, valid_criterion, i2w, n_epochs, evaluate_every=1, early_stop=3, step_size=1, gamma=0.5, model_dir="", exp_id=None):
+    scheduler = StepLR(optimizer, step_size=step_size, gamma=gamma)
+
+    best_val_metric = -100
+    count_stop = 0
+
+    for epoch in range(n_epochs):
+        model.train()
+        total_train_loss = 0
+        list_hyp, list_label = [], []
+        
+        train_pbar = tqdm(iter(train_loader), leave=True, total=len(train_loader))
+        for i, batch_data in enumerate(train_pbar):
+            loss, batch_hyp, batch_label = forward_fn(model, batch_data[:-1], i2w=i2w, device=args['device'])
+
+            optimizer.zero_grad()
+            if args['fp16']:
+                with amp.scale_loss(loss, optimizer) as scaled_loss:
+                    scaled_loss.backward()
+                torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args['max_norm'])
+            else:
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), args['max_norm'])
+            optimizer.step()
+
+            tr_loss = loss.item()
+            total_train_loss = total_train_loss + tr_loss
+
+            # Calculate metrics
+            list_hyp += batch_hyp
+            list_label += batch_label
+            
+            train_pbar.set_description("(Epoch {}) TRAIN LOSS:{:.4f} LR:{:.8f}".format((epoch+1),
+                total_train_loss/(i+1), get_lr(args, optimizer)))
+                        
+        metrics = metrics_fn(list_hyp, list_label)
+        print("(Epoch {}) TRAIN LOSS:{:.4f} {} LR:{:.8f}".format((epoch+1),
+            total_train_loss/(i+1), metrics_to_string(metrics), get_lr(args, optimizer)))
+        
+        # Decay Learning Rate
+        scheduler.step()
+
+        # evaluate
+        if ((epoch+1) % evaluate_every) == 0:
+            val_loss, val_metrics = evaluate(model, valid_loader, forward_fn, metrics_fn, i2w, is_test=False)
+
+            # Early stopping
+            val_metric = val_metrics[valid_criterion]
+            if best_val_metric < val_metric:
+                best_val_metric = val_metric
+                # save model
+                if exp_id is not None:
+                    torch.save(model.state_dict(), model_dir + "/best_model_" + str(exp_id) + ".th")
+                else:
+                    torch.save(model.state_dict(), model_dir + "/best_model.th")
+                count_stop = 0
+            else:
+                count_stop += 1
+                print("count stop:", count_stop)
+                if count_stop == early_stop:
+                    break
+```
+
+#### Evaluation Step
+```python
+
+```
+
 
 Before we dive into deep learning for NLP, we need to know what deep learning is. So, in short, deep learning is a term to cover multi-layers neural-network-based machine learning algorithms where the model is updated iteratively by applying gradient descent. Each layer on a deep neural network consists of two kind functions that we need to implement before we can use a deep learning model: forward function and backward function. If we have these two functions for all kinds of layers we can then build a deep neural network model, BUT the model will not be able to learn until we define one more function, the loss function. So far, we have identified the three fundamental functions that need to be implemented to build a deep learning model. So, can we build a deep neural network model now? Not yet, there are two problems here. First, there are so many variations for each of these three functions, it will be very time consuming for us to implement it by ourselves, and second, unfortunately... there is a great deal of MATHEMATICAL understanding behind each of them >o< >o< >o< !!!! 
 
