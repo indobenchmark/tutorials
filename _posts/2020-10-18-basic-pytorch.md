@@ -74,10 +74,15 @@ Let's start learning how to build a deep learning model using PyTorch.
 <div id="sec2"></div>
 ### Building a Model Using PyTorch
 
+We'll start simple. Let's use the available pretrained model, and then fine-tune (train) the model again, to accomodate our example above. (musti di state ini kita kasih example buat NLP bahasa Indonesia loh)
+
 We show examples to use PyTorch for training a model based on the [IndoNLU project](https://github.com/indobenchmark/indonlu). 
 
 <div id="sec2-1"></div>
 #### Model
+
+Let's import the available pretrained model, from the [IndoNLU project](https://github.com/indobenchmark/indonlu), using Hugging-Face library. Thanks IndoNLU, thanks Hugging-Face! (suruh install requirements dulu ga?) (suruh siapin jupyter notebook ato kita siapin jupyter notebook ga?)
+
 ```python
 from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
 
@@ -89,7 +94,12 @@ config = BertConfig.from_pretrained(args['model_checkpoint'])
 model = BertForSequenceClassification.from_pretrained(args['model_checkpoint'], config=config)
 ```
 
+Done! With this, we have now the indobert-base-p1 model ready to be trained (fine-tuned).
+
 #### Training Step
+
+Here we are going to train (fine-tune) the indobert-base-p1 model for XXXX task.
+
 ```python
 def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, valid_criterion, i2w, n_epochs, evaluate_every=1, early_stop=3, step_size=1, gamma=0.5, model_dir="", exp_id=None):
     scheduler = StepLR(optimizer, step_size=step_size, gamma=gamma)
