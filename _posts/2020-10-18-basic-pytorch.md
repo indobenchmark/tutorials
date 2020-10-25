@@ -79,9 +79,83 @@ We'll start simple. Let's use the available pretrained model, and then fine-tune
 We show examples to use PyTorch for training a model based on the [IndoNLU project](https://github.com/indobenchmark/indonlu). 
 
 <div id="sec2-1"></div>
+#### Data Preparation
+Let's start with data preparation with PyTorch. Data preparation is one of the fundamental part in modeling, it is even commonly said to take 60% of the time from the whole modeling pipeline. Fortunately in PyTorch, they have prepared tons of utility
+
+PyTorch provides a standardize way to prepare data for the model. It provides advanced features for data processing and to be able to utilize those features, we need to utilized 2 classes which are `Dataset` and `DataLoader`. `Dataset` is an abstract class that we need to extend in PyTorch, we will pass the dataset object into `DataLoader` class for further processing of the batch data. `DataLoader` is the heart of PyTorch data loading utility. It provides many functionalities for preparing batch data including different sampling methods, data parallelization, and even for distributed processing.
+
+Now, let's try to create the data preparation for our sentiment analysis dataset. First, we need to know the format of our data. Our data is stored in `tsv` format and two columns `text` and `sentiment`. Here are some example of the dataset
+```
+TABLE
+```
+
+Now, let's start to prepare the piplline. First, let's import the required components
+```
+from torch.utils.data import Dataset, DataLoader
+``` 
+
+Next, we will implement a `Dataset` called `DocumentSentimentDataset` for our dataset
+```
+class DocumentSentimentDataset(Dataset):
+    # Static constant variable
+    LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2}
+    INDEX2LABEL = {0: 'positive', 1: 'neutral', 2: 'negative'}
+    NUM_LABELS = 3
+    
+    def load_dataset(self, path): 
+        df = pd.read_csv(path, header=None)
+        df.columns = ['text','sentiment']
+        df['sentiment'] = df['sentiment'].apply(lambda lab: self.LABEL2INDEX[lab])
+        return df
+    
+    def __init__(self, dataset_path, tokenizer, no_special_token=False, *args, **kwargs):
+        self.data = self.load_dataset(dataset_path)
+        self.tokenizer = tokenizer
+        self.no_special_token = no_special_token
+    
+    def __getitem__(self, index):
+        data = self.data.loc[index,:]
+        text, sentiment = data['text'], data['sentiment']
+        subwords = self.tokenizer.encode(text, add_special_tokens=not self.no_special_token)
+        return np.array(subwords), np.array(sentiment), data['text']
+    
+    def __len__(self):
+        return len(self.data)   
+```
+
+Hooray!! We have implemented the required `DocumentSentimentDataset` class. You might notice that the dataset return `subwords` that can have different length for each index. In order to be fed to the model in batch, we need to standardize the length of the sequence. Regarding sequence length, we might also want to limit the sequence length to prevent costly computation. In this case we gonna create `DocumentSentimentDataLoader` extending the PyTorch `DataLoader`
+```
+class DocumentSentimentDataLoader(DataLoader):
+    def __init__(self, max_seq_len=512, *args, **kwargs):
+        super(DocumentSentimentDataLoader, self).__init__(*args, **kwargs)
+        self.collate_fn = self._collate_fn
+        self.max_seq_len = max_seq_len
+        
+    def _collate_fn(self, batch):
+        batch_size = len(batch)
+        max_seq_len = max(map(lambda x: len(x[0]), batch))
+        max_seq_len = min(self.max_seq_len, max_seq_len)
+        
+        subword_batch = np.zeros((batch_size, max_seq_len), dtype=np.int64)
+        mask_batch = np.zeros((batch_size, max_seq_len), dtype=np.float32)
+        sentiment_batch = np.zeros((batch_size, 1), dtype=np.int64)
+        
+        seq_list = []
+        for i, (subwords, sentiment, raw_seq) in enumerate(batch):
+            subwords = subwords[:max_seq_len]
+            subword_batch[i,:len(subwords)] = subwords
+            mask_batch[i,:len(subwords)] = 1
+            sentiment_batch[i,0] = sentiment
+            
+            seq_list.append(raw_seq)
+            
+        return subword_batch, mask_batch, sentiment_batch, seq_list
+```
+
+
 #### Model
 
-Let's import the available pretrained model, from the [IndoNLU project](https://github.com/indobenchmark/indonlu), using Hugging-Face library. Thanks IndoNLU, thanks Hugging-Face! (suruh install requirements dulu ga?) (suruh siapin jupyter notebook ato kita siapin jupyter notebook ga?)
+Let's import the available pretrained model, from the [IndoNLU project](https://github.com/indobenchmark/indonlu), using Hugging-Face library. Thanks IndoNLU, thanks Hugging-Face! (suruh install requirements dulu ga? Iya) (suruh siapin jupyter notebook ato kita siapin jupyter notebook ga? Ga usah lah)
 
 ```python
 from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
