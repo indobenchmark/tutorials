@@ -143,70 +143,70 @@ Next, we will implement the `DocumentSentimentDataset` class for loading our dat
 First, let’s define class and the` __init__(self, ...)` function
 ```python
 class DocumentSentimentDataset(Dataset):
-	# Static constant variable (We need to have this part to comply with IndoNLU standard)
-	LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2} # Label string to index
-	INDEX2LABEL = {0: 'positive', 1: 'neutral', 2: 'negative'} # Index to label string
-	NUM_LABELS = 3 # Number of label
+    # Static constant variable (We need to have this part to comply with IndoNLU standard)
+    LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2} # Label string to index
+    INDEX2LABEL = {0: 'positive', 1: 'neutral', 2: 'negative'} # Index to label string
+    NUM_LABELS = 3 # Number of label
    
-	def load_dataset(self, path):
-    	df = pd.read_csv(path, sep=’\t’, header=None) # Read tsv file with pandas
-    	df.columns = ['text','sentiment'] # Rename the columns
-    	df['sentiment'] = df['sentiment'].apply(lambda lab: self.LABEL2INDEX[lab]) # Convert string label into index
-    	return df
+    def load_dataset(self, path):
+        df = pd.read_csv(path, sep=’\t’, header=None) # Read tsv file with pandas
+        df.columns = ['text','sentiment'] # Rename the columns
+        df['sentiment'] = df['sentiment'].apply(lambda lab: self.LABEL2INDEX[lab]) # Convert string label into index
+        return df
    
-	def __init__(self, dataset_path, tokenizer, *args, **kwargs):
-    	self.data = self.load_dataset(dataset_path) # Load the tsv file
+    def __init__(self, dataset_path, tokenizer, *args, **kwargs):
+        self.data = self.load_dataset(dataset_path) # Load the tsv file
 
         # Assign the tokenizer for tokenization
         # here we use subword tokenizer from HuggingFace
-    	self.tokenizer = tokenizer 
+        self.tokenizer = tokenizer 
 ```
 
 Now, we already have the data and the tokenizer defined in the `__init__(self, ...)` function. Next, let’s use it to `__getitem__(self, index)` and `__len__(self)` functions.
 ```python
-	def __getitem__(self, index):
-    	data = self.data.loc[index,:] # Taking data from a specific row from Pandas
-    	text, sentiment = data['text'], data['sentiment'] # Take text and sentiment from the row
-    	subwords = self.tokenizer.encode(text) # Tokenize the text with tokenizer
-	
-	# Return numpy array of subwords and label
-    	return np.array(subwords), np.array(sentiment), data['text']
+    def __getitem__(self, index):
+        data = self.data.loc[index,:] # Taking data from a specific row from Pandas
+        text, sentiment = data['text'], data['sentiment'] # Take text and sentiment from the row
+        subwords = self.tokenizer.encode(text) # Tokenize the text with tokenizer
+    
+    # Return numpy array of subwords and label
+        return np.array(subwords), np.array(sentiment), data['text']
    
-	def __len__(self):
-    	return len(self.data)  # Return the length of the dataset
+    def __len__(self):
+        return len(self.data)  # Return the length of the dataset
 ```
 
 So, that’s it for the `DocumentSentimentDataset`. The full class definition is as follow:
 ```python
 class DocumentSentimentDataset(Dataset):
-	# Static constant variable (We need to have this part to comply with IndoNLU standard)
-	LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2} # Label string to index
-	INDEX2LABEL = {0: 'positive', 1: 'neutral', 2: 'negative'} # Index to label string
-	NUM_LABELS = 3 # Number of label
+    # Static constant variable (We need to have this part to comply with IndoNLU standard)
+    LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2} # Label string to index
+    INDEX2LABEL = {0: 'positive', 1: 'neutral', 2: 'negative'} # Index to label string
+    NUM_LABELS = 3 # Number of label
    
-	def load_dataset(self, path):
-    	df = pd.read_csv(path, sep=’\t’, header=None) # Read tsv file with pandas
-    	df.columns = ['text','sentiment'] # Rename the columns
-    	df['sentiment'] = df['sentiment'].apply(lambda lab: self.LABEL2INDEX[lab]) # Convert string label into index
-    	return df
+    def load_dataset(self, path):
+        df = pd.read_csv(path, sep=’\t’, header=None) # Read tsv file with pandas
+        df.columns = ['text','sentiment'] # Rename the columns
+        df['sentiment'] = df['sentiment'].apply(lambda lab: self.LABEL2INDEX[lab]) # Convert string label into index
+        return df
    
-	def __init__(self, dataset_path, tokenizer, no_special_token=False, *args, **kwargs):
-    	self.data = self.load_dataset(dataset_path) # Load the tsv file
+    def __init__(self, dataset_path, tokenizer, no_special_token=False, *args, **kwargs):
+        self.data = self.load_dataset(dataset_path) # Load the tsv file
 
         # Assign the tokenizer for tokenization
         # here we use subword tokenizer to convert text into subword
-    	self.tokenizer = tokenizer 
+        self.tokenizer = tokenizer 
 
-	def __getitem__(self, index):
-    	data = self.data.loc[index,:] # Taking data from a specific row from Pandas
-    	text, sentiment = data['text'], data['sentiment'] # Take text and sentiment from the row
-    	subwords = self.tokenizer.encode(text) # Tokenize the text with tokenizer
+    def __getitem__(self, index):
+        data = self.data.loc[index,:] # Taking data from a specific row from Pandas
+        text, sentiment = data['text'], data['sentiment'] # Take text and sentiment from the row
+        subwords = self.tokenizer.encode(text) # Tokenize the text with tokenizer
 
-	# Return numpy array of subwords and label
-    	return np.array(subwords), np.array(sentiment)
+    # Return numpy array of subwords and label
+        return np.array(subwords), np.array(sentiment)
    
-	def __len__(self):
-    	return len(self.data)  # Specify the length of the dataset
+    def __len__(self):
+        return len(self.data)  # Specify the length of the dataset
 ```
  
 Notice that the dataset class returns `subwords` that can have different length for each index. In order to be fed to the model in batch, we need to standardize the length of the sequence by truncating the length and adding padding tokens. In this case we are going to implement the `DocumentSentimentDataLoader` class extending the PyTorch `DataLoader`.
@@ -216,30 +216,30 @@ In order to have the specified functionality, we need to override the `collate_f
 In the above visualization, 0 value means padding token. `mask` only consists of two values 0 and 1, where 0 means this token should be ignored by the model and 1 means this token should be considered by the model. OK, let’s now define our `DocumentSentimentDataLoader`
 ```python
 class DocumentSentimentDataLoader(DataLoader):
-	def __init__(self, max_seq_len=512, *args, **kwargs):
-    	super(DocumentSentimentDataLoader, self).__init__(*args, **kwargs)
+    def __init__(self, max_seq_len=512, *args, **kwargs):
+        super(DocumentSentimentDataLoader, self).__init__(*args, **kwargs)
 self.max_seq_len = max_seq_len # Assign max limit of the sequence length
-    	self.collate_fn = self._collate_fn # Assign the collate_fn function with our function
+        self.collate_fn = self._collate_fn # Assign the collate_fn function with our function
        
-	def _collate_fn(self, batch):
-    	batch_size = len(batch) # Take the batch size
-    	max_seq_len = max(map(lambda x: len(x[0]), batch)) # Find maximum sequence length from the batch 
-    	max_seq_len = min(self.max_seq_len, max_seq_len) # Compare with our defined limit
+    def _collate_fn(self, batch):
+        batch_size = len(batch) # Take the batch size
+        max_seq_len = max(map(lambda x: len(x[0]), batch)) # Find maximum sequence length from the batch 
+        max_seq_len = min(self.max_seq_len, max_seq_len) # Compare with our defined limit
        
-	# Create buffer for subword, mask, and sentiment labels, initialize all with 0
-    	subword_batch = np.zeros((batch_size, max_seq_len), dtype=np.int64)
-    	mask_batch = np.zeros((batch_size, max_seq_len), dtype=np.float32)
-    	sentiment_batch = np.zeros((batch_size, 1), dtype=np.int64)
+    # Create buffer for subword, mask, and sentiment labels, initialize all with 0
+        subword_batch = np.zeros((batch_size, max_seq_len), dtype=np.int64)
+        mask_batch = np.zeros((batch_size, max_seq_len), dtype=np.float32)
+        sentiment_batch = np.zeros((batch_size, 1), dtype=np.int64)
        
-	# Fill all of the buffer
-    	for i, (subwords, sentiment, raw_seq) in enumerate(batch):
-        	subwords = subwords[:max_seq_len]
-        	subword_batch[i,:len(subwords)] = subwords
-        	mask_batch[i,:len(subwords)] = 1
-        	sentiment_batch[i,0] = sentiment
+    # Fill all of the buffer
+        for i, (subwords, sentiment, raw_seq) in enumerate(batch):
+            subwords = subwords[:max_seq_len]
+            subword_batch[i,:len(subwords)] = subwords
+            mask_batch[i,:len(subwords)] = 1
+            sentiment_batch[i,0] = sentiment
            
-	# Return the subword, mask, and sentiment data
-    	return subword_batch, mask_batch, sentiment_batch
+    # Return the subword, mask, and sentiment data
+        return subword_batch, mask_batch, sentiment_batch
 ```
 
 Hooray!! We have implemented our `DocumentSentimentDataLoader`. Now let’s try to integrate this `DocumentSentimentDataset` and `DocumentSentimentDataLoader`. We can initialize our `DocumentSentimentDataset` and `DocumentSentimentDataLoader` in the following way:
@@ -338,10 +338,10 @@ The training script above uses the `forward_sequence_classification` function, a
 def forward_sequence_classification(model, batch_data, i2w, is_test=False, device='cpu', **kwargs):
     …
     if device == "cuda":
-    	subword_batch = subword_batch.cuda()
+        subword_batch = subword_batch.cuda()
         mask_batch = mask_batch.cuda()
         token_type_batch = token_type_batch.cuda() if token_type_batch is not None else None
-    	label_batch = label_batch.cuda()
+        label_batch = label_batch.cuda()
     
     # Forward model
     outputs = model(subword_batch, attention_mask=mask_batch, token_type_ids = token_type_batch, labels=label_batch)
@@ -422,7 +422,7 @@ def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, 
 ```
 
 ##### CPU vs CUDA
-```
+```python
 model = model.cuda()
 ```
 
@@ -430,20 +430,20 @@ Training a million parameterized models like BERT on the CPU will take a vast am
 
 ##### Loss Function
 
-```
-    loss_fct = CrossEntropyLoss()
-    total_loss = 0
-    for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
-        label = labels[:,i]
-        loss = loss_fct(logit.view(-1, num_label), label.view(-1))
-        total_loss += loss
+```python
+loss_fct = CrossEntropyLoss()
+total_loss = 0
+for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
+    label = labels[:,i]
+    loss = loss_fct(logit.view(-1, num_label), label.view(-1))
+    total_loss += loss
 ```
 
 In PyTorch, we can build our own loss function or use loss function provided by the pytorch package. Building custom loss functions in Pytorch is not that hard actually, we just need to define a function that compares the output logits tensor with the label tensor and with that our loss function can have the same properties as the provided loss functions (automatically computed gradients, etc.). In our example here, we are using a provided loss function called `CrossEntropyLoss()`. Cross entropy loss is calculated by comparing how well the probability distribution output by Softmax matches the one-hot-encoded ground truth label of the data. We use this loss function in our sentiment analysis case because this loss fits perfectly to our needs as this is stating the likelihood of the model's capability to output perfect separability of the possible sentiment category in the label.
 
 ##### Optimizer and Back Propagation
 
-```
+```python
 optimizer = optim.Adam(model.parameters(), lr=5e-6)
 
 optimizer.zero_grad()
@@ -467,37 +467,37 @@ Evaluate the predictions using sklearn functions that are provided in the `docum
 We can see that the points above are coded in this below evaluation script that we will use for our fine tuning evaluation.
 
 ```python
-    # Evaluate on validation
-    model.eval()
-    torch.set_grad_enabled(False)
+# Evaluate on validation
+model.eval()
+torch.set_grad_enabled(False)
+
+total_loss, total_correct, total_labels = 0, 0, 0
+list_hyp, list_label = [], []
+
+pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
+for i, batch_data in enumerate(pbar):
+    batch_seq = batch_data[-1]        
+    loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
     
-    total_loss, total_correct, total_labels = 0, 0, 0
-    list_hyp, list_label = [], []
+    # Calculate total loss
+    valid_loss = loss.item()
+    total_loss = total_loss + valid_loss
 
-    pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
-    for i, batch_data in enumerate(pbar):
-        batch_seq = batch_data[-1]        
-        loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
-        
-        # Calculate total loss
-        valid_loss = loss.item()
-        total_loss = total_loss + valid_loss
-
-        # Calculate evaluation metrics
-        list_hyp += batch_hyp
-        list_label += batch_label
-        metrics = document_sentiment_metrics_fn(list_hyp, list_label)
-
-        pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
-        
+    # Calculate evaluation metrics
+    list_hyp += batch_hyp
+    list_label += batch_label
     metrics = document_sentiment_metrics_fn(list_hyp, list_label)
-    print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
-        total_loss/(i+1), metrics_to_string(metrics)))
+
+    pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
+    
+metrics = document_sentiment_metrics_fn(list_hyp, list_label)
+print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
+    total_loss/(i+1), metrics_to_string(metrics)))
 ```
 
 The evaluation script above uses the `document_sentiment_metrics_fn` function to do the mentioned accuracy, F1 score, recall, and precision metrics calculations, and the following is the snippet of it.
 
-```
+```python
 def document_sentiment_metrics_fn(list_hyp, list_label):
     metrics = {}
     metrics["ACC"] = accuracy_score(list_label, list_hyp)
