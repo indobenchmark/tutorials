@@ -121,13 +121,13 @@ import torch
 
 <div id="dataset"></div>
 #### Sentiment Analysis Dataset
-To add the benefit to your fun, let’s start with sentiment analysis, one of the most popular use cases yet easy to implement. Sentiment analysis is a natural language processing task to understand a sentiment within a body of text. In business, it is beneficial to automatically analyze customer review that is written i.e. in Twitter, Zomato, TripAdvisor, Facebook, Instagram, Qraved, and to understand the polarity of their review, whether it is a positive, negative, or a neutral review. As this kind of review dataset is included in one of the downstream tasks provided in the IndoNLU called SmSA ((https://github.com/indobenchmark/indonlu/tree/master/dataset/smsa_doc-sentiment-prosa) along with all the needed resources, let’s begin our interesting project.
+To add the benefit to your fun, let’s start with sentiment analysis, one of the most popular use cases yet easy to implement. Sentiment analysis is a natural language processing task to understand a sentiment within a body of text. In business, it is beneficial to automatically analyze customer review that is written i.e. in Twitter, Zomato, TripAdvisor, Facebook, Instagram, Qraved, and to understand the polarity of their review, whether it is a positive, negative, or a neutral review. As this kind of review dataset is included in one of the downstream tasks provided in the IndoNLU called [SmSA](https://github.com/indobenchmark/indonlu/tree/master/dataset/smsa_doc-sentiment-prosa) along with all the needed resources, let’s begin our interesting project.
 
 <div id="data-prep"></div>
 #### Data Preparation
 Data preparation is one of the fundamental parts in modeling, it is even commonly said to take 60% of the time from the whole modeling pipeline. Fortunately, the tons of utilities provided by PyTorch and IndoNLU can simplify this process.
  
-PyTorch provides a standardized way to prepare data for the model. It provides advanced features for data processing and to be able to utilize those features, we need to utilize 2 classes from `torch.utils.data` package, which are `Dataset` and `DataLoader`. `Dataset` is an abstract class that we need to extend in PyTorch, we will pass the dataset object into `DataLoader` class for further processing of the batch data. `DataLoader` is the heart of PyTorch data loading utility. It provides many functionalities for preparing batch data including different sampling methods, data parallelization, and even for distributed processing. To show how to implement `Dataset` and `DataLoader` in PyTorch, we are going to dig deeper into `DocumentSentimentDataset` and `DocumentSentimentDataLoader` classes from IndoNLU that can be found in https://github.com/indobenchmark/indonlu/blob/master/utils/data_utils.py.
+PyTorch provides a standardized way to prepare data for the model. It provides advanced features for data processing and to be able to utilize those features, we need to utilize 2 classes from `torch.utils.data` package, which are `Dataset` and `DataLoader`. `Dataset` is an abstract class that we need to extend in PyTorch, we will pass the dataset object into `DataLoader` class for further processing of the batch data. `DataLoader` is the heart of PyTorch data loading utility. It provides many functionalities for preparing batch data including different sampling methods, data parallelization, and even for distributed processing. To show how to implement `Dataset` and `DataLoader` in PyTorch, we are going to dig deeper into `DocumentSentimentDataset` and `DocumentSentimentDataLoader` classes from IndoNLU that can be found in the following [link](https://github.com/indobenchmark/indonlu/blob/master/utils/data_utils.py).
 
 Before we begin with implementation, we need to know the format of our sentiment dataset. Our data is stored in `tsv` format and has two columns `text` and `sentiment`. Here are some examples of the dataset
 
@@ -512,7 +512,6 @@ This evaluation then concludes the whole modelling process. We hope you get a go
 
 <div id="resources"></div>
 #### Additional Resources
-
 - [Github](https://github.com/indobenchmark/indonlu)
 - [Model IndoNLU di HuggingFace](https://huggingface.co/indobenchmark)
 - [Beranda](https://www.indobenchmark.com/)

@@ -120,13 +120,13 @@ import torch
 
 <div id="dataset"></div>
 #### Dataset Sentiment Analysis
-Sebagai contoh kasus, dalam tutorial ini kita akan menggunakan dataset sentiment analysis. Sentiment analysis merupakan salah satu task yang paling populer di NLP. Dalam sentiment analysis kita akan membangun model yang dapat mendeteksi sentimen dalam sebuah kalimat. Umumnya, sentimen memiliki tiga nilai polaritas yaitu positif, negatif, dan netral. Di berbagai industri, sangatlah menguntungkan jika dapat menganalisa review dari pelanggan secara otomatis. Review-review tersebut dapat berasal dari berbagai macam platform sosial seperti Twitter, Zomato, TripAdvisor, Facebook, Instagram, dan lain-lain. Dataset sentiment analysis yang akan kita gunakan berasal dari salah satu task di IndoNLU yang bernama SmSA (https://github.com/indobenchmark/indonlu/tree/master/dataset/smsa_doc-sentiment-prosa). Mari kita mulai proyek sentiment analysis ini.
+Sebagai contoh kasus, dalam tutorial ini kita akan menggunakan dataset sentiment analysis. Sentiment analysis merupakan salah satu task yang paling populer di NLP. Dalam sentiment analysis kita akan membangun model yang dapat mendeteksi sentimen dalam sebuah kalimat. Umumnya, sentimen memiliki tiga nilai polaritas yaitu positif, negatif, dan netral. Di berbagai industri, sangatlah menguntungkan jika dapat menganalisa review dari pelanggan secara otomatis. Review-review tersebut dapat berasal dari berbagai macam platform sosial seperti Twitter, Zomato, TripAdvisor, Facebook, Instagram, dan lain-lain. Dataset sentiment analysis yang akan kita gunakan berasal dari salah satu task di IndoNLU yang bernama [SmSA](https://github.com/indobenchmark/indonlu/tree/master/dataset/smsa_doc-sentiment-prosa). Mari kita mulai proyek sentiment analysis ini.
 
 <div id="data-prep"></div>
 #### Data Preparation
 Kita mulai proyek ini dengan persiapan data di PyTorch. Persiapan data adalah salah satu tahap yang paling penting dalam pemodelan. Secara umum, persiapan data memakan kurang lebih 60% dari total waktu untuk persiapan pemodelan. Untungnya, berbagai fungsi untuk melakukan data preprocessing, telah disediakan oleh PyTorch dan IndoNLU.
  
-PyTorch menyediakan cara terstandarisasi untuk menyiapkan data untuk melakukan pemodelan. PyTorch menyediakan fitur-fitur canggih untuk memproses data dan untuk dapat menggunakan fitur-fitur tersebut, kita perlu menggunakan 2 kelas yang disediakan di PyTorch dalam modul `torch.utils.data` yaitu `Dataset` dan `DataLoader`. `Dataset` is sebuah abstract class yang perlu kita extend di PyTorch, kita akan mengoper objek dari kelas `Dataset` ke dalam objek dari kelas `DataLoader`. `DataLoader` adalah inti dari perangkat pemrosesan data di PyTorch. `DataLoader` menyediakan banyak fungsionalitas untuk mempersiapkan data termasuk berbagai metode sampling, komputasi paralel, dan pemrosesan terdistribusi. Untuk menunjukan bagaimana cara mengimplementasi `Dataset` dan `DataLoader` di PyTorch, kita akan melihat lebih dalam pada kelas `DocumentSentimentDataset` and `DocumentSentimentDataLoader` yang disediakan oleh IndoNLU dan dapat diakses di https://github.com/indobenchmark/indonlu/blob/master/utils/data_utils.py.
+PyTorch menyediakan cara terstandarisasi untuk menyiapkan data untuk melakukan pemodelan. PyTorch menyediakan fitur-fitur canggih untuk memproses data dan untuk dapat menggunakan fitur-fitur tersebut, kita perlu menggunakan 2 kelas yang disediakan di PyTorch dalam modul `torch.utils.data` yaitu `Dataset` dan `DataLoader`. `Dataset` is sebuah abstract class yang perlu kita extend di PyTorch, kita akan mengoper objek dari kelas `Dataset` ke dalam objek dari kelas `DataLoader`. `DataLoader` adalah inti dari perangkat pemrosesan data di PyTorch. `DataLoader` menyediakan banyak fungsionalitas untuk mempersiapkan data termasuk berbagai metode sampling, komputasi paralel, dan pemrosesan terdistribusi. Untuk menunjukan bagaimana cara mengimplementasi `Dataset` dan `DataLoader` di PyTorch, kita akan melihat lebih dalam pada kelas `DocumentSentimentDataset` and `DocumentSentimentDataLoader` yang disediakan oleh IndoNLU dan dapat diakses di [link](https://github.com/indobenchmark/indonlu/blob/master/utils/data_utils.py) berikut.
  
 Sebelum masuk ke implementasi, kita perlu mengetahui format dari dataset sentiment analysis yang kita gunakan. Dataset SmSA yang akan kita gunakan tersimpan dalam format `tsv` dan terdiri dari 2 kolom, yaitu: `text` dan `sentiment`. Berikut adalah contoh dari data pada dataset SmSA
 
@@ -442,9 +442,7 @@ def document_sentiment_metrics_fn(list_hyp, list_label):
 Dengan evaluasi ini, kita menyimpulkan keseluruhan proses pemodelan kita pada in IndoTutorial ini. Kami berharap Anda mendapatkan hasil yang bagus pada percobaan Anda dan kami harap Anda menikmati tutorial singkat tapi menyenangkan yang kami buat ini. Jika Anda telah menyelesaikan tutorial ini, posting pengalaman dan hasil anda di story facebook anda dan ajak dan berikan inspirasi kepada orang lain untuk melakukan hal yang sama dengan membagikan tutorial ini kepada penggemar deep learning dan NLP di seluruh Indonesia!
 
 <div id="resources"></div>
-
 #### Sumber Tambahan
-
 - [Github](https://github.com/indobenchmark/indonlu)
-- [IndoNLU HuggingFace model](https://huggingface.co/indobenchmark)
-- [Homepage](https://www.indobenchmark.com/)
+- [Model IndoNLU di HuggingFace](https://huggingface.co/indobenchmark)
+- [Beranda](https://www.indobenchmark.com/)
