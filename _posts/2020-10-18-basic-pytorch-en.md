@@ -82,7 +82,7 @@ By checking the lexical terms, we can easily fool our model to classify the `sec
 Before we go to deep learning modeling with PyTorch, we will first explain briefly about the task categories in NLP.
 
 <div id="tasks"></div>
-#### Kategori task dibidang NLP
+#### Category of NLP Tasks
 There are different tasks in Natural Language Processing. We can outline main categories of the NLP tasks as follow
 - Text Classification <br/>
     We aim to classify a text or document with a label class. Our example above is one of the examples. We predict an emotion label corresponding to the text.
