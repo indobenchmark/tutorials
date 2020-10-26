@@ -354,7 +354,7 @@ In both the training script and forward function above we leverage some of the p
 <div id="training-phase"></div>
 #### Training Step
 
-Here we are going to train (fine-tune) the indobert-base-p1 model for XXXX task.
+Here we are going to fine-tune the `indobert-base-p1` model with our sentiment analysis dataset.
 
 ```python
 def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, valid_criterion, i2w, n_epochs, evaluate_every=1, early_stop=3, step_size=1, gamma=0.5, model_dir="", exp_id=None):
