@@ -507,6 +507,6 @@ This evaluation then concludes the whole modelling process. We hope you get a go
 <div id="resources"></div>
 #### Additional Resources
 
-Github: https://github.com/indobenchmark/indonlu
-HuggingFace portal: https://huggingface.co/indobenchmark
-Homepage: https://www.indobenchmark.com/
+- [Github](https://github.com/indobenchmark/indonlu)
+- [HuggingFace portal](https://huggingface.co/indobenchmark)
+- [Homepage](https://www.indobenchmark.com/)
