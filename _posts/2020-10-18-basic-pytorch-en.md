@@ -430,7 +430,7 @@ Training a million parameterized models like BERT on the CPU will take a vast am
 
 ##### Loss Function
 
-```
+```python
     loss_fct = CrossEntropyLoss()
     total_loss = 0
     for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
@@ -443,7 +443,7 @@ In PyTorch, we can build our own loss function or use loss function provided by 
 
 ##### Optimizer and Back Propagation
 
-```
+```python
 optimizer = optim.Adam(model.parameters(), lr=5e-6)
 
 optimizer.zero_grad()
@@ -467,37 +467,37 @@ Evaluate the predictions using sklearn functions that are provided in the `docum
 We can see that the points above are coded in this below evaluation script that we will use for our fine tuning evaluation.
 
 ```python
-    # Evaluate on validation
-    model.eval()
-    torch.set_grad_enabled(False)
+# Evaluate on validation
+model.eval()
+torch.set_grad_enabled(False)
+
+total_loss, total_correct, total_labels = 0, 0, 0
+list_hyp, list_label = [], []
+
+pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
+for i, batch_data in enumerate(pbar):
+    batch_seq = batch_data[-1]        
+    loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
     
-    total_loss, total_correct, total_labels = 0, 0, 0
-    list_hyp, list_label = [], []
+    # Calculate total loss
+    valid_loss = loss.item()
+    total_loss = total_loss + valid_loss
 
-    pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
-    for i, batch_data in enumerate(pbar):
-        batch_seq = batch_data[-1]        
-        loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
-        
-        # Calculate total loss
-        valid_loss = loss.item()
-        total_loss = total_loss + valid_loss
-
-        # Calculate evaluation metrics
-        list_hyp += batch_hyp
-        list_label += batch_label
-        metrics = document_sentiment_metrics_fn(list_hyp, list_label)
-
-        pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
-        
+    # Calculate evaluation metrics
+    list_hyp += batch_hyp
+    list_label += batch_label
     metrics = document_sentiment_metrics_fn(list_hyp, list_label)
-    print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
-        total_loss/(i+1), metrics_to_string(metrics)))
+
+    pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
+    
+metrics = document_sentiment_metrics_fn(list_hyp, list_label)
+print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
+    total_loss/(i+1), metrics_to_string(metrics)))
 ```
 
 The evaluation script above uses the `document_sentiment_metrics_fn` function to do the mentioned accuracy, F1 score, recall, and precision metrics calculations, and the following is the snippet of it.
 
-```
+```python
 def document_sentiment_metrics_fn(list_hyp, list_label):
     metrics = {}
     metrics["ACC"] = accuracy_score(list_label, list_hyp)

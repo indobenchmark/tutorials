@@ -418,7 +418,7 @@ def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, 
 ```
 
 ##### CPU vs CUDA
-```
+```python
 model = model.cuda()
 ```
 
@@ -426,20 +426,20 @@ Training a million parameterized models like BERT on the CPU will take a vast am
 
 ##### Loss Function
 
-```
-    loss_fct = CrossEntropyLoss()
-    total_loss = 0
-    for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
-        label = labels[:,i]
-        loss = loss_fct(logit.view(-1, num_label), label.view(-1))
-        total_loss += loss
+```python
+loss_fct = CrossEntropyLoss()
+total_loss = 0
+for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
+    label = labels[:,i]
+    loss = loss_fct(logit.view(-1, num_label), label.view(-1))
+    total_loss += loss
 ```
 
 In PyTorch, we can build our own loss function or use loss function provided by the pytorch package. Building custom loss functions in Pytorch is not that hard actually, we just need to define a function that compares the output logits tensor with the label tensor and with that our loss function can have the same properties as the provided loss functions (automatically computed gradients, etc.). In our example here, we are using a provided loss function called `CrossEntropyLoss()`. Cross entropy loss is calculated by comparing how well the probability distribution output by Softmax matches the one-hot-encoded ground truth label of the data. We use this loss function in our sentiment analysis case because this loss fits perfectly to our needs as this is quantifying the model's capability to distinguish the true sentiment from the possibility of the sentiments available in our data.
 
 ##### Optimizer and Back Propagation
 
-```
+```python
 optimizer = optim.Adam(model.parameters(), lr=5e-6)
 
 optimizer.zero_grad()
@@ -462,37 +462,37 @@ Evaluate the predictions using sklearn functions that are provided in the `docum
 We can see that the points above are coded in this below evaluation script that we will use for our fine tuning evaluation.
 
 ```python
-    # Evaluate on validation
-    model.eval()
-    torch.set_grad_enabled(False)
+# Evaluate on validation
+model.eval()
+torch.set_grad_enabled(False)
+
+total_loss, total_correct, total_labels = 0, 0, 0
+list_hyp, list_label = [], []
+
+pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
+for i, batch_data in enumerate(pbar):
+    batch_seq = batch_data[-1]        
+    loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
     
-    total_loss, total_correct, total_labels = 0, 0, 0
-    list_hyp, list_label = [], []
+    # Calculate total loss
+    valid_loss = loss.item()
+    total_loss = total_loss + valid_loss
 
-    pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
-    for i, batch_data in enumerate(pbar):
-        batch_seq = batch_data[-1]        
-        loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
-        
-        # Calculate total loss
-        valid_loss = loss.item()
-        total_loss = total_loss + valid_loss
-
-        # Calculate evaluation metrics
-        list_hyp += batch_hyp
-        list_label += batch_label
-        metrics = document_sentiment_metrics_fn(list_hyp, list_label)
-
-        pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
-        
+    # Calculate evaluation metrics
+    list_hyp += batch_hyp
+    list_label += batch_label
     metrics = document_sentiment_metrics_fn(list_hyp, list_label)
-    print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
-        total_loss/(i+1), metrics_to_string(metrics)))
+
+    pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
+    
+metrics = document_sentiment_metrics_fn(list_hyp, list_label)
+print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
+    total_loss/(i+1), metrics_to_string(metrics)))
 ```
 
 The evaluation script above uses the `document_sentiment_metrics_fn` function to do the mentioned accuracy, F1 score, recall, and precision metrics calculations, and the following is the snippet of it.
 
-```
+```python
 def document_sentiment_metrics_fn(list_hyp, list_label):
     metrics = {}
     metrics["ACC"] = accuracy_score(list_label, list_hyp)
@@ -503,3 +503,4 @@ def document_sentiment_metrics_fn(list_hyp, list_label):
 ```
 
 This evaluation then concludes the whole modelling process. We hope you get a good result on your experiment and we hope you enjoyed our short but fun tutorial. If you have finished this tutorial, post your experiences and results in your facebook story. Inspire others to do the same by sharing this tutorial to other deep learning and NLP enthusiasts around the world!
+
