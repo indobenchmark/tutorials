@@ -508,3 +508,6 @@ def document_sentiment_metrics_fn(list_hyp, list_label):
 ```
 
 This evaluation then concludes the whole modelling process. We hope you get a good result on your experiment and we hope you enjoyed our short but fun tutorial. If you have finished this tutorial, post your experiences and results in your facebook story. Inspire others to do the same by sharing this tutorial to other deep learning and NLP enthusiasts around the world!
+
+<div id="resources"></div>
+#### References
