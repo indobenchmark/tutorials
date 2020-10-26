@@ -213,7 +213,7 @@ Notice that the dataset class returns `subwords` that can have different length 
 
 In order to have the specified functionality, we need to override the `collate_fn(self, batch)` function from the `DataLoader` class. `collate_fn()` is a function that will be called after the dataloader collects a batch of data from the dataset. The argument `batch` consists of a list of data returned from the `Dataset.__getitem__()`. Our `collate_fn(self, batch)` function will receive list of `subword` and `sentiment` and spit out tuples of `padded_subword`, `mask`, and `sentiment`. `mask` is a variable that we use to prevent the model from considering the padding token as part of the input. To simplify, the visualization below shows the process of our `collate_fn(self, batch)` transform input subword into the padded subword and mask.
 
-In the above visualization, 0 value means padding token. `mask` only consists of two values 0 and 1, where 0 means this token should be ignored by model and 1 means this token should be considered by model. OK, let’s now define our `DocumentSentimentDataLoader`
+In the above visualization, 0 value means padding token. `mask` only consists of two values 0 and 1, where 0 means this token should be ignored by the model and 1 means this token should be considered by the model. OK, let’s now define our `DocumentSentimentDataLoader`
 ```python
 class DocumentSentimentDataLoader(DataLoader):
 	def __init__(self, max_seq_len=512, *args, **kwargs):
