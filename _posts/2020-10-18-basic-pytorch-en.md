@@ -266,7 +266,6 @@ For our modeling purpose, we are going to use a very popular model in NLP called
 
 <img src="/tutorials/assets/img/model.png"/>
 
-
 There is an option to do modeling but not from scratch, that is to only tell the model to learn a little bit more from what it already knows. This kind of training is called fine-tuning. So here, we’re not doing the training from scratch, but rather, we will download the pretrained model from IndoNLU, specifically the [`indobenchmark/indobert-base-p1`](https://huggingface.co/indobenchmark/indobert-base-p1) model.
 
 Now, let’s import the available pretrained model from the IndoNLU project that is hosted in the Hugging-Face platform. Thanks IndoNLU and Hugging-Face! For our sentiment analysis task, we will perform fine-tuning using the `BertForSequenceClassification` model class from HuggingFace `transformers` package.
@@ -420,6 +419,8 @@ def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, 
                 if count_stop == early_stop:
                     break
 ```
+
+In both the training script and forward function above we leverage some of the pytorch capabilities, such as the easiness of switching the computation to CPU or GPU, the flexibilities of defining the loss function and computing the loss, and also the hassle-free gradient update by leveraging the autograd package to do the optimization and back propagation. Let’s add some more detail into the capabilities we are leveraging on.
 
 ##### CPU vs CUDA
 ```
