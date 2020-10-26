@@ -106,17 +106,17 @@ PyTorch adalah salah satu open-source framework deep learning terbaik yang diban
 PyTorch dapat diinstall dan digunakan hampir diseluruh sistem operasi dengan menggunakan `Anaconda` atau `pip`. 
 
 Bila menggunakan `Anaconda`, PyTorch dapat diinstall dengan cara mengeksekusi perintah berikut
-```
+```bash
 conda install pytorch torchvision -c pytorch
 ```
 
 Bila menggunakan `pip`, PyTorch dapat diinstall dengan cara mengeksekusi perintah berikut
-```
+```bash
 pip install torch torchvision
 ```
 
 Untuk menggunakan PyTorch pada kode Python kita dapat lakukan dengan melakukan import modul PyTorch
-```
+```python
 import torch
 ```
 
@@ -135,14 +135,14 @@ Sebelum masuk ke implementasi, kita perlu mengetahui format dari dataset sentime
 <img src="/tutorials/assets/img/sample.png"/>
 
 Mari kita mulai mempersiapkan pipeline pemrosesan data. Pertama-tama, mari kita import modul-modul yang diperlukan
-```
+```python
 from torch.utils.data import Dataset, DataLoader
 ```
  
 Berikutnya, kita akan mengimplementasi kelas `DocumentSentimentDataset` untuk data loading. Untuk membuat kelas `DocumentSentimentDataset` yang fungsional, kita perlu mengimplementasikan 3 fungsi, yaitu `__init__(self, ...)`, `__getitem__(self, index)`, dan `__len__(self)`. 
 
 Pertama-tama, mari kita implementasikan fungsi ` __init__(self, ...)` 
-```
+```python
 class DocumentSentimentDataset(Dataset):
 	# Static constant variable
 	LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2} # Map dari label string ke index
@@ -163,7 +163,7 @@ class DocumentSentimentDataset(Dataset):
 ```
 
 Sekarang kita sudah memiliki data dan tokenizer yang didefinisikan difungsi `__init__(self, ...)`. Selanjutnya kita akan mengimplementasikan fungsi `__getitem__(self, index)` dan `__len__(self)`.
-```
+```python
 	def __getitem__(self, index):
     	data = self.data.loc[index,:] # Ambil data pada baris tertentu dari tabel
     	text, sentiment = data['text'], data['sentiment'] # Ambil nilai text dan sentiment
@@ -177,7 +177,7 @@ Sekarang kita sudah memiliki data dan tokenizer yang didefinisikan difungsi `__i
 ```
 
 Ya, kita sudah mengimplementasikan seluruh fungsi pada `DocumentSentimentDataset`. Definisi lengkap dari `DocumentSentimentDataset` adalah seperti berikut:
-```
+```python
 class DocumentSentimentDataset(Dataset):
 	# Static constant variable
 	LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2} # Map dari label string ke index
@@ -215,7 +215,7 @@ Untuk mendapatkan fungsi yang sesuai dengan apa yang kita butuhkan, kita dapat m
 <img src="/tutorials/assets/img/padding_mask.png"/>
 
 Dari gambar diatas, angka 0 pada subword keluaran menandakan padding token, sedangkan nilai lainnya adalah nilai dari subword masukan. Variable `mask` terdiri dari dua buah nilai, 0 and 1, dimana 0 berarti token tidak perlu masuk dalah perhitungan model dan 1 berarti token yang perlu diperhitungkan. OK, sekarang mari kita implementasikan kelas  `DocumentSentimentDataLoader`.
-```
+```python
 class DocumentSentimentDataLoader(DataLoader):
 	def __init__(self, max_seq_len=512, *args, **kwargs):
     	super(DocumentSentimentDataLoader, self).__init__(*args, **kwargs)
@@ -245,13 +245,13 @@ self.max_seq_len = max_seq_len # Assign batas maksimum subword
 
 Horeee!! Kita sudah berhasil mengimplementasikan kelas `DocumentSentimentDataLoader`. Sekarang mari kita coba integrasikan kelas `DocumentSentimentDataset` and `DocumentSentimentDataLoader`. Kita dapat menginisialisasi kelas `DocumentSentimentDataset` and `DocumentSentimentDataLoader` dengan cara berikut ini:
 
-```
+```python
 dataset = DocumentSentimentDataset(‘./sentiment_analysis.csv’, tokenizer)
 data_loader = DocumentSentimentDataLoader(dataset=dataset, max_seq_len=512, batch_size=32 num_workers=16, shuffle=True)  
 ```
 
 Kemudian kita bisa mengambil data dari dataloader dengan cara berikut:
-```
+```python
 for (subword, mask, label) in data_loader:
     …
 ```

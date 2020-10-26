@@ -89,12 +89,12 @@ Before we begin with implementation, we need to know the format of our sentiment
 <img src="">
 
 Now, let's start to prepare the piplline. First, let's import the required components
-```
+```python
 from torch.utils.data import Dataset, DataLoader
 ``` 
 
 Next, we will implement a `Dataset` called `DocumentSentimentDataset` for our dataset
-```
+```python
 class DocumentSentimentDataset(Dataset):
     # Static constant variable
     LABEL2INDEX = {'positive': 0, 'neutral': 1, 'negative': 2}
@@ -123,7 +123,7 @@ class DocumentSentimentDataset(Dataset):
 ```
 
 Hooray!! We have implemented the required `DocumentSentimentDataset` class. You might notice that the dataset return `subwords` that can have different length for each index. In order to be fed to the model in batch, we need to standardize the length of the sequence. Regarding sequence length, we might also want to limit the sequence length to prevent costly computation. In this case we gonna create `DocumentSentimentDataLoader` extending the PyTorch `DataLoader`
-```
+```python
 class DocumentSentimentDataLoader(DataLoader):
     def __init__(self, max_seq_len=512, *args, **kwargs):
         super(DocumentSentimentDataLoader, self).__init__(*args, **kwargs)
