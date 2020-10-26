@@ -443,7 +443,7 @@ Dengan evaluasi ini, kita menyimpulkan keseluruhan proses pemodelan kita pada in
 
 <div id="resources"></div>
 
-#### Additional Resources
+#### Sumber Tambahan
 
 - [Github](https://github.com/indobenchmark/indonlu)
 - [IndoNLU HuggingFace model](https://huggingface.co/indobenchmark)
