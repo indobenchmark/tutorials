@@ -80,14 +80,13 @@ We show examples to use PyTorch for training a model based on the [IndoNLU proje
 
 <div id="sec2-1"></div>
 #### Data Preparation
-Let's start with data preparation with PyTorch. Data preparation is one of the fundamental part in modeling, it is even commonly said to take 60% of the time from the whole modeling pipeline. Fortunately in PyTorch, they have prepared tons of utility
+Data preparation is one of the fundamental parts in modeling, it is even commonly said to take 60% of the time from the whole modeling pipeline. Fortunately, the tons of utilities provided by PyTorch and IndoNLU can simplify this process.
+ 
+PyTorch provides a standardized way to prepare data for the model. It provides advanced features for data processing and to be able to utilize those features, we need to utilize 2 classes from `torch.utils.data` package, which are `Dataset` and `DataLoader`. `Dataset` is an abstract class that we need to extend in PyTorch, we will pass the dataset object into `DataLoader` class for further processing of the batch data. `DataLoader` is the heart of PyTorch data loading utility. It provides many functionalities for preparing batch data including different sampling methods, data parallelization, and even for distributed processing. To show how to implement `Dataset` and `DataLoader` in PyTorch, we are going to dig deeper into `DocumentSentimentDataset` and `DocumentSentimentDataLoader` classes from IndoNLU that can be found in https://github.com/indobenchmark/indonlu/blob/master/utils/data_utils.py.
 
-PyTorch provides a standardize way to prepare data for the model. It provides advanced features for data processing and to be able to utilize those features, we need to utilized 2 classes which are `Dataset` and `DataLoader`. `Dataset` is an abstract class that we need to extend in PyTorch, we will pass the dataset object into `DataLoader` class for further processing of the batch data. `DataLoader` is the heart of PyTorch data loading utility. It provides many functionalities for preparing batch data including different sampling methods, data parallelization, and even for distributed processing.
+Before we begin with implementation, we need to know the format of our sentiment dataset. Our data is stored in `tsv` format and has two columns `text` and `sentiment`. Here are some examples of the dataset
 
-Now, let's try to create the data preparation for our sentiment analysis dataset. First, we need to know the format of our data. Our data is stored in `tsv` format and two columns `text` and `sentiment`. Here are some example of the dataset
-```
-TABLE
-```
+<img src="">
 
 Now, let's start to prepare the piplline. First, let's import the required components
 ```
