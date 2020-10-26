@@ -24,16 +24,16 @@ Dalam tutorial ini kamu akan belajar bagaimana implementasi model deep learning 
 <ul>
 <li><a href="#background">Deep Learning di NLP</a>
     <ul>
-        <li href="#introduction">Transisi dari sistem berbasis aturan ke deep learning</li>
-        <li href="#tasks">Kategori task dibidang NLP</li>
+        <li><a href="#introduction">Transisi dari sistem berbasis aturan ke deep learning</a></li>
+        <li><a href="#tasks">Kategori task dibidang NLP</a></li>
     </ul>
 </li>
 <li><a href="#nlp-pytorch">Membangun model NLP dengan PyTorch</a>
   <ul>
     <li><a href="#pytorch">Apa itu PyTorch?</a></li>
     <li><a href="#data-prep">Data Preparation</a></li>
-    <li><a href="#model">Modeling</a></li>
-    <li><a href="#training-phase">Training Phase</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="#training-phase">Training Step</a></li>
     <li><a href="#evaluation-phase">Evaluation Phase</a></li>
   </ul>
 </li>
