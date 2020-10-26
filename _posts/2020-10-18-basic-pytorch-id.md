@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Tutorial penggunaan Pre-Trained Model untuk NLP dengan menggunakan PyTorch
-sub_tile: "Tutorial penggunaan IndoNLU untk Pemula"
+sub_tile: "Tutorial penggunaan PyTorch danIndoNLU untk Pemula"
 categories:
   - PyTorch
   - Deep Learning
@@ -67,8 +67,6 @@ Solusi sederhana untuk aplikasi NLP adalah dengan aturan keyword matching. Dalam
 
 Untuk memperlihatkan perbedaan kedua metode tersebut, mari lihat kembali contoh sebelumnya!
 
-To show the difference between those methods, we will show you back the previous example!
-
 <div class="message" style="padding-bottom:1px;background:#eee">
 <img width=50px src="/tutorials/assets/img/example.png" style="float:left;margin-right:40px;margin-top:8px"/>
 <div style="color:#555">
@@ -81,16 +79,16 @@ To show the difference between those methods, we will show you back the previous
 
 Dengan melakukan pengecekan kata, kita dapat dengan mudah mengelabui model untuk mengklasifikasi emosi pada kalimat `kedua` sebagai `senang` karena terdapat frasa `memenangkan undian`. Jika model tersebut dapat memahami arti dari kalimat kedua, maka model dapat dengan mudah mengetahui perubahan makna setelah klausa pertama dimana orang yang mengatakan kalimat tersebut sedih karena ia tidak memenangkan undian.
 
-Sebelum maju lebih jauh pada pemodelan deep learning model dengan PyTorch, kita akan membahas sedikit lebih jauh mengenai jenis-jenis task di NLP.
+Sebelum masuk ke pemodelan deep learning model dengan PyTorch, kita akan membahas sedikit lebih jauh mengenai jenis-jenis task di NLP.
 
 <div id="tasks"></div>
 #### Kategori task dibidang NLP
 Dibidang NLP, terdapat banyak task yang dapat dicapai. Kita dapat membagi task-task tersebut kedalam beberapa kategori sebagai berikut
-- Text Classification
+- Text Classification <br/>
     Klasifikasi dokumen dengan sebuah label. Contoh pendeteksian emosi sebelumnya adalah salah satu contoh dari kategori ini. Kita memprediksi label emosi bergantung dari kalimat yang diberikan.
-- Sequence Labeling
+- Sequence Labeling <br/>
     Kategori task ini melakukan prediksi label untuk setiap token dalam teks masukan. Task yang paling umum dalam kategori ini adalah Named Entity Recognition yang bertujuan untuk mendeteksi token pada kalimat masukan mana yang merupakan nama dari suatu entitas named entities.
-- Language Generation
+- Language Generation <br/>
     Dalam kategori task ini, model akan menghasilkan serangkaian kalimat baru berdasarkan kalimat masukan yang diberikan. Salah satu contoh dari kategori ini adalah mesin penjawab pertanyaan, dimana model menerima pertanyaan masukan dan konteks pertanyaan sebagai masukan dan menghasilkan kalimat jawaban dari pertanyaan tersebut.
 
 Dalam tutorial ini, kita akan melihat contoh aplikasi deep learning pada kategori text classification. Jika kamu baru pertama kali belajar deep learning, ini akan menjadi jalan pintas untuk mempelajari model deep learning pada kasus NLP dengan menggunakan PyTorch.
@@ -193,7 +191,7 @@ class DocumentSentimentDataset(Dataset):
 	def __init__(self, dataset_path, tokenizer, *args, **kwargs):
     	self.data = self.load_dataset(dataset_path) # Load tsv file
 
-# Assign tokenizer, disini kita menggunakan tokenizer subword dari HuggingFace
+        # Assign tokenizer, disini kita menggunakan tokenizer subword dari HuggingFace
     	self.tokenizer = tokenizer 
 
 	def __getitem__(self, index):
