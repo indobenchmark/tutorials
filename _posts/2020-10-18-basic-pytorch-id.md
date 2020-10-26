@@ -442,15 +442,9 @@ def document_sentiment_metrics_fn(list_hyp, list_label):
 Dengan evaluasi ini, kita menyimpulkan keseluruhan proses pemodelan kita pada in IndoTutorial ini. Kami berharap Anda mendapatkan hasil yang bagus pada percobaan Anda dan kami harap Anda menikmati tutorial singkat tapi menyenangkan yang kami buat ini. Jika Anda telah menyelesaikan tutorial ini, posting pengalaman dan hasil anda di story facebook anda dan ajak dan berikan inspirasi kepada orang lain untuk melakukan hal yang sama dengan membagikan tutorial ini kepada penggemar deep learning dan NLP di seluruh Indonesia!
 
 <div id="resources"></div>
-<<<<<<< HEAD
+
 #### Additional Resources
 
 - [Github](https://github.com/indobenchmark/indonlu)
 - [HuggingFace portal](https://huggingface.co/indobenchmark)
 - [Homepage](https://www.indobenchmark.com/)
-=======
-#### Sumber Tambahan
-- Github: https://github.com/indobenchmark/indonlu
-- HuggingFace portal: https://huggingface.co/indobenchmark
-- Homepage: https://www.indobenchmark.com/
->>>>>>> a9beca2461f212aac3411947084316e48d9badaf

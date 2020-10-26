@@ -512,13 +512,7 @@ This evaluation then concludes the whole modelling process. We hope you get a go
 
 <div id="resources"></div>
 #### Sumber Tambahan
-<<<<<<< HEAD
 
 - [Github](https://github.com/indobenchmark/indonlu)
 - [Portal HuggingFace portal](https://huggingface.co/indobenchmark)
 - [Beranda](https://www.indobenchmark.com/)
-=======
-- Github: https://github.com/indobenchmark/indonlu
-- HuggingFace portal: https://huggingface.co/indobenchmark
-- Homepage: https://www.indobenchmark.com/
->>>>>>> a9beca2461f212aac3411947084316e48d9badaf
