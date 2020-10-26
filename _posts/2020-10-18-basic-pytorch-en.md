@@ -262,20 +262,95 @@ Ok, for the next section we are going to use our `DocumentSentimentDataset` and 
 <div id="model"></div>
 #### Model
 
-Let's import the available pretrained model, from the [IndoNLU project](https://github.com/indobenchmark/indonlu), using Hugging-Face library. Thanks IndoNLU, thanks Hugging-Face! (suruh install requirements dulu ga? Iya) (suruh siapin jupyter notebook ato kita siapin jupyter notebook ga? Ga usah lah)
+For our modeling purpose, we are going to use a very popular model in NLP called BERT. BERT is a very popular pre-trained contextualized language model that stands for Bidirectional Encoder Representations from Transformers. Just like what it says in its name, BERT makes use of transformers, the attention mechanism that takes contextual relations between words in a text into account. Before BERT, the most popular techniques were recurrent based models, which read the text input sequentially. What makes BERT better is that it removes the first order markov assumption and provides a self-attention mechanism. 
+
+
+
+
+There is an option to do modeling but not from scratch, that is to only tell the model to learn a little bit more from what it already knows. This kind of training is called fine-tuning. So here, we’re not doing the training from scratch, but rather, we will download the pretrained model from IndoNLU, specifically the [`indobenchmark/indobert-base-p1`](https://huggingface.co/indobenchmark/indobert-base-p1) model.
+
+Now, let’s import the available pretrained model from the IndoNLU project that is hosted in the Hugging-Face platform. Thanks IndoNLU and Hugging-Face! For our sentiment analysis task, we will perform fine-tuning using the `BertForSequenceClassification` model class from HuggingFace `transformers` package.
 
 ```python
 from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
 
-args = {}
-args["model_checkpoint"] = "indobenchmark/indobert-base-p1"
+tokenizer = BertTokenizer.from_pretrained("indobenchmark/indobert-base-p1")
+config = BertConfig.from_pretrained("indobenchmark/indobert-base-p1")
+Model = BertForSequenceClassification.from_pretrained("indobenchmark/indobert-base-p1", config=config)
+```
+Done! We now have the `indobert-base-p1` tokenizer and model ready to be fine-tuned.
+Training Phase
+Here we are going to fine-tune the `indobert-base-p1` model with our sentiment analysis dataset.
 
-tokenizer = BertTokenizer.from_pretrained(args['model_checkpoint'])
-config = BertConfig.from_pretrained(args['model_checkpoint'])
-model = BertForSequenceClassification.from_pretrained(args['model_checkpoint'], config=config)
+Another essential feature that PyTorch provides is the autograd package. So, before we jump into training the model, we first briefly welcome an autograd to join the team. Basically, what autograd does is to provide automatic differentiation for all operations that happened on Tensors. This framework automatically generates a computational graph that will be used in the backpropagation. 
+
+The finetuning training is done in these steps:
+1. Define an optimizer `Adam` with a small learning rate, usually below `1e-3`
+2. Enable the dropout regularization layer in the model by calling `model.train()`
+3. Enable the autograd computation by calling `torch.set_grad_enabled(True)`
+4. Iterate our data loader `train_loader` to get `batch_data` and pass it to the forward function `forward_sequence_classification` in the model.
+5. Calculate the gradient by calling `loss.backward()` to compute all the gradients automatically. This function is inherited by the autograd package.
+6. Call `optimizer.step()` to apply gradient update operation.’
+
+We can see that the points above are coded in this below training script that we will use later for our finetuning.
+
+```python
+optimizer = optim.Adam(model.parameters(), lr=3e-6)
+model = model.cuda()
+
+n_epochs = 5
+for epoch in range(n_epochs):
+    model.train()
+    torch.set_grad_enabled(True)
+ 
+    total_train_loss = 0
+    list_hyp, list_label = [], []
+
+    train_pbar = tqdm(train_loader, leave=True, total=len(train_loader))
+    for i, batch_data in enumerate(train_pbar):
+        # Forward model
+        loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
+
+        # Update model
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        tr_loss = loss.item()
+        total_train_loss = total_train_loss + tr_loss
+
+        # Calculate metrics
+        list_hyp += batch_hyp
+        list_label += batch_label
+
+        train_pbar.set_description("(Epoch {}) TRAIN LOSS:{:.4f} LR:{:.8f}".format((epoch+1),
+            total_train_loss/(i+1), get_lr(optimizer)))
+
+    # Calculate train metric
+    metrics = document_sentiment_metrics_fn(list_hyp, list_label)
+    print("(Epoch {}) TRAIN LOSS:{:.4f} {} LR:{:.8f}".format((epoch+1),
+        total_train_loss/(i+1), metrics_to_string(metrics), get_lr(optimizer)))
 ```
 
-Done! With this, we have now the indobert-base-p1 model ready to be trained (fine-tuned).
+The training script above uses the `forward_sequence_classification` function, as the forward function, and following is the snippet of the important parts of  `forward_sequence_classification` function.
+
+```python
+def forward_sequence_classification(model, batch_data, i2w, is_test=False, device='cpu', **kwargs):
+    …
+    if device == "cuda":
+    	subword_batch = subword_batch.cuda()
+        mask_batch = mask_batch.cuda()
+        token_type_batch = token_type_batch.cuda() if token_type_batch is not None else None
+    	label_batch = label_batch.cuda()
+    
+    # Forward model
+    outputs = model(subword_batch, attention_mask=mask_batch, token_type_ids = token_type_batch, labels=label_batch)
+        loss, logits = outputs[:2]
+    …
+    return loss, list_hyp, list_label
+```
+
+In both the training script and forward function above we leverage some of the pytorch capabilities, such as the easiness of switching the computation to CPU or GPU, the flexibilities of defining the loss function and computing the loss, and also the hassle-free gradient update by leveraging the autograd package to do the optimization and back propagation. Let’s add some more detail into the capabilities we are leveraging on.
 
 <div id="training-phase"></div>
 #### Training Step
@@ -346,12 +421,90 @@ def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, 
                     break
 ```
 
-<div id="evaluation-phase"></div>
-#### Evaluation Step
-```python
-
+##### CPU vs CUDA
+```
+model = model.cuda()
 ```
 
+Training a million parameterized models like BERT on the CPU will take a vast amount of time. The linear algebra operations are done in parallel on the GPU and therefore you can achieve around 100x faster in training time. To cater for this need, PyTorch has prepared an easy way for us to move our tensor data typed variable to be computed either in CPU or GPU. This is done by accessing the method `.cuda()` or `.cpu()` in every tensor instantiated class and also the model, to move an object either to GPU memory from CPU memory, or vice versa.
 
-Before we dive into deep learning for NLP, we need to know what deep learning is. So, in short, deep learning is a term to cover multi-layers neural-network-based machine learning algorithms where the model is updated iteratively by applying gradient descent. Each layer on a deep neural network consists of two kind functions that we need to implement before we can use a deep learning model: forward function and backward function. If we have these two functions for all kinds of layers we can then build a deep neural network model, BUT the model will not be able to learn until we define one more function, the loss function. So far, we have identified the three fundamental functions that need to be implemented to build a deep learning model. So, can we build a deep neural network model now? Not yet, there are two problems here. First, there are so many variations for each of these three functions, it will be very time consuming for us to implement it by ourselves, and second, unfortunately... there is a great deal of MATHEMATICAL understanding behind each of them >o< >o< >o< !!!! 
+##### Loss Function
 
+```
+    loss_fct = CrossEntropyLoss()
+    total_loss = 0
+    for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
+        label = labels[:,i]
+        loss = loss_fct(logit.view(-1, num_label), label.view(-1))
+        total_loss += loss
+```
+
+In PyTorch, we can build our own loss function or use loss function provided by the pytorch package. Building custom loss functions in Pytorch is not that hard actually, we just need to define a function that compares the output logits tensor with the label tensor and with that our loss function can have the same properties as the provided loss functions (automatically computed gradients, etc.). In our example here, we are using a provided loss function called `CrossEntropyLoss()`. Cross entropy loss is calculated by comparing how well the probability distribution output by Softmax matches the one-hot-encoded ground truth label of the data. We use this loss function in our sentiment analysis case because this loss fits perfectly to our needs as this is stating the likelihood of the model's capability to output perfect separability of the possible sentiment category in the label.
+
+##### Optimizer and Back Propagation
+
+```
+optimizer = optim.Adam(model.parameters(), lr=5e-6)
+
+optimizer.zero_grad()
+loss.backward()
+optimizer.step()
+```
+
+Initializing the optimizer needs us to explicitly tell it what parameters (tensors) of the model it should be updating. To do a back propagation, we only need to call `.backward()` on the loss Variable as this will start a process of backpropagation at the end loss and goes through all of its parents all the way to model inputs and output the gradient needed for backpropagation. Behind the curtain, while you’re called `loss.backward()`, gradients are "stored" by the tensors themselves (they have a grad and a requires_grad attributes). This is why, to do the backpropagation, optimizers don’t need to know anything about your loss. To update the gradient for all tensors in the model, we need to zero out all the previous grad from previous training by calling `optimizer.zero_grad()`, and then we need to call `optimizer.step()` as this will make the optimizer iterate over all parameters (tensors) it is supposed to update (requires_grad =True) and use their internally stored grad to update their values.
+
+<div id="evaluation-phase"></div>
+#### Evaluation Step
+
+At each of the epoch training, we will evaluate the trained model performance. In the above finetuning training tutorial, we set the `set_grad_enabled` parameter as True, allowing all the gradients computed automatically when we call `loss.backward()`. In this evaluation phase, we don’t need that capability to be activated, and we don’t want to update any gradient parameters in any of the tensors. thus we set the `set_grad_enabled` parameter as False.
+
+The fine tuning validation is done in these steps:
+Enable the autograd computation by calling `torch.set_grad_enabled(True)`.
+Iterate our data loader `valid_loader` to get `batch_data`.
+Pass it to the same forward function `forward_sequence_classification` in the model to output the model prediction.
+Evaluate the predictions using sklearn functions that are provided in the `document_sentiment_metrics_fn` script, to output the accuracy, F1 score, recall, and precision.
+
+We can see that the points above are coded in this below evaluation script that we will use for our fine tuning evaluation.
+
+```python
+    # Evaluate on validation
+    model.eval()
+    torch.set_grad_enabled(False)
+    
+    total_loss, total_correct, total_labels = 0, 0, 0
+    list_hyp, list_label = [], []
+
+    pbar = tqdm(valid_loader, leave=True, total=len(valid_loader))
+    for i, batch_data in enumerate(pbar):
+        batch_seq = batch_data[-1]        
+        loss, batch_hyp, batch_label = forward_sequence_classification(model, batch_data[:-1], i2w=i2w, device='cuda')
+        
+        # Calculate total loss
+        valid_loss = loss.item()
+        total_loss = total_loss + valid_loss
+
+        # Calculate evaluation metrics
+        list_hyp += batch_hyp
+        list_label += batch_label
+        metrics = document_sentiment_metrics_fn(list_hyp, list_label)
+
+        pbar.set_description("VALID LOSS:{:.4f} {}".format(total_loss/(i+1), metrics_to_string(metrics)))
+        
+    metrics = document_sentiment_metrics_fn(list_hyp, list_label)
+    print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
+        total_loss/(i+1), metrics_to_string(metrics)))
+```
+
+The evaluation script above uses the `document_sentiment_metrics_fn` function to do the mentioned accuracy, F1 score, recall, and precision metrics calculations, and the following is the snippet of it.
+
+```
+def document_sentiment_metrics_fn(list_hyp, list_label):
+    metrics = {}
+    metrics["ACC"] = accuracy_score(list_label, list_hyp)
+    metrics["F1"] = f1_score(list_label, list_hyp, average='macro')
+    metrics["REC"] = recall_score(list_label, list_hyp, average='macro')
+    metrics["PRE"] = precision_score(list_label, list_hyp, average='macro')
+    return metrics
+```
+
+This evaluation then concludes the whole modelling process. We hope you get a good result on your experiment and we hope you enjoyed our short but fun tutorial. If you have finished this tutorial, post your experiences and results in your facebook story. Inspire others to do the same by sharing this tutorial to other deep learning and NLP enthusiasts around the world!
