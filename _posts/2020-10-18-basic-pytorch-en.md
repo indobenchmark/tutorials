@@ -134,7 +134,7 @@ Before we begin with implementation, we need to know the format of our sentiment
 <img src="/tutorials/assets/img/sample.png"/>
 
 Now, let's start to prepare the pipeline. First, let's import the required components
-```
+```python
 from torch.utils.data import Dataset, DataLoader
 ```
  
@@ -157,8 +157,8 @@ class DocumentSentimentDataset(Dataset):
 	def __init__(self, dataset_path, tokenizer, *args, **kwargs):
     	self.data = self.load_dataset(dataset_path) # Load the tsv file
 
-# Assign the tokenizer for tokenization
-# here we use subword tokenizer from HuggingFace
+        # Assign the tokenizer for tokenization
+        # here we use subword tokenizer from HuggingFace
     	self.tokenizer = tokenizer 
 ```
 
