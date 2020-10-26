@@ -514,5 +514,5 @@ This evaluation then concludes the whole modelling process. We hope you get a go
 #### Sumber Tambahan
 
 - [Github](https://github.com/indobenchmark/indonlu)
-- [Portal HuggingFace](https://huggingface.co/indobenchmark)
+- [Model IndoNLU di HuggingFace](https://huggingface.co/indobenchmark)
 - [Beranda](https://www.indobenchmark.com/)

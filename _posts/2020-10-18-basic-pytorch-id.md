@@ -446,5 +446,5 @@ Dengan evaluasi ini, kita menyimpulkan keseluruhan proses pemodelan kita pada in
 #### Additional Resources
 
 - [Github](https://github.com/indobenchmark/indonlu)
-- [HuggingFace portal](https://huggingface.co/indobenchmark)
+- [IndoNLU HuggingFace model](https://huggingface.co/indobenchmark)
 - [Homepage](https://www.indobenchmark.com/)
