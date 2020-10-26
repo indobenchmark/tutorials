@@ -33,8 +33,8 @@ In this tutorial, you will learn how to implement deep learning models for natur
     <li><a href="#pytorch">PyTorch Framework</a></li>
     <li><a href="#data-prep">Data Preparation</a></li>
     <li><a href="#model">Modeling</a></li>
-    <li><a href="#training-phase">Training Phase</a></li>
-    <li><a href="#evaluation-phase">Evaluation Phase</a></li>
+    <li><a href="#training-phase">Training Step</a></li>
+    <li><a href="#evaluation-phase">Evaluation Step</a></li>
   </ul>
 </li>
 <li><a href="#resources">Additional Resources</a></li>
