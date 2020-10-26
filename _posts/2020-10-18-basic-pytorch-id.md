@@ -258,15 +258,16 @@ Sangat mudah bukan? Seperti yang kita lihat, pada parameter instansiasi kelas `D
 
 Pada sesi selanjutnya, kita akan menggunakan `DocumentSentimentDataset` dan `DocumentSentimentDataLoader` dalam proses pemodelan
 
+<div id="model"></div>
 #### Model
 
-For our modeling purpose, we are going to use a very popular model in NLP called BERT. BERT is a very popular pre-trained contextualized language model that stands for Bidirectional Encoder Representations from Transformers. Just like what it says in its name, BERT makes use of transformers, the attention mechanism that takes contextual relations between words in a text into account. Before BERT, the most popular techniques were recurrent based models, which read the text input sequentially. What makes BERT better is that it removes the first order markov assumption and provides a self-attention mechanism. The architecture of BERT model is shown in the following figure.
+Untuk kebutuhan pemodelan, kita akan menggunakan salah satu model yang paling terkenal saat ini di bidang NLP yang bernama BERT (Bidirectional Encoder Representations from Transformers). Sesuai dengan namanya, BERT merupakan model berbasis transformer, mekanisme attention yang memperhitungan relasi kontekstual antar kata dari sebuah kalimat. Sebelum BERT, model-model yang populer adalah model berbasis RNN (recurrent neural network), yang memproses input text secara sekuensial. Hal yang membuat BERT lebih baik dari model berbasis RNN adalah BERT model tidak berdasarkan pada markov assumption dan menggunakan mekanisme self-attention. 
 
 <img src="/tutorials/assets/img/model.png"/>
 
-There is an option to do modeling but not from scratch, that is to only tell the model to learn a little bit more from what it already knows. This kind of training is called fine-tuning. So here, we’re not doing the training from scratch, but rather, we will download the pretrained model from IndoNLU, specifically the [`indobenchmark/indobert-base-p1`](https://huggingface.co/indobenchmark/indobert-base-p1) model.
+Untuk melatih model, kita dapat melakukan training tidak dari awal, yaitu dengan menggunakan model yang telah dilatih sebelumnya dan hanya belajar sedikit lagi untuk  mencapai titik optimal pada task yang baru. Teknik training ini disebut sebagai fine-tuning. Dengan cara ini, kita tidak perlu melakukan training dari awal, tetapi kita dapat mendownload model yang telah dilatih sebelumnya (pre-trained model) dari IndoNLU, pada tutorial ini kita akan menggunakan pre-trained model [`indobenchmark/indobert-base-p1`](https://huggingface.co/indobenchmark/indobert-base-p1).
 
-Now, let’s import the available pretrained model from the IndoNLU project that is hosted in the Hugging-Face platform. Thanks IndoNLU and Hugging-Face! For our sentiment analysis task, we will perform fine-tuning using the `BertForSequenceClassification` model class from HuggingFace `transformers` package.
+Sekarang, kita akan mengambil pre-trained model dari IndoNLU yang dapat diakses melalui platform Hugging-Face. Terima kasih IndoNLU dan Hugging-Face! Untuk tutorial analisa sentimen ini, kita akan melakukan fine-tuning dengan menggunakan kelas model `BertForSequenceClassification` dari library `transformers` milik HuggingFace.
 
 ```python
 from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
@@ -275,21 +276,23 @@ tokenizer = BertTokenizer.from_pretrained("indobenchmark/indobert-base-p1")
 config = BertConfig.from_pretrained("indobenchmark/indobert-base-p1")
 Model = BertForSequenceClassification.from_pretrained("indobenchmark/indobert-base-p1", config=config)
 ```
-Done! We now have the `indobert-base-p1` tokenizer and model ready to be fine-tuned.
-Training Phase
-Here we are going to fine-tune the `indobert-base-p1` model with our sentiment analysis dataset.
+Selesai! Sekarang kita sudah memiliki `indobert-base-p1` tokenizer dan model yang sudah siap untuk di fine-tune.
 
-Another essential feature that PyTorch provides is the autograd package. So, before we jump into training the model, we first briefly welcome an autograd to join the team. Basically, what autograd does is to provide automatic differentiation for all operations that happened on Tensors. This framework automatically generates a computational graph that will be used in the backpropagation. 
+#### Fase Training
+Di sini, kita akan melakukan fine-tune pre-trained model `indobert-base-p1` dengan data analisis sentimen.
 
-The finetuning training is done in these steps:
-1. Define an optimizer `Adam` with a small learning rate, usually below `1e-3`
-2. Enable the dropout regularization layer in the model by calling `model.train()`
-3. Enable the autograd computation by calling `torch.set_grad_enabled(True)`
-4. Iterate our data loader `train_loader` to get `batch_data` and pass it to the forward function `forward_sequence_classification` in the model.
-5. Calculate the gradient by calling `loss.backward()` to compute all the gradients automatically. This function is inherited by the autograd package.
-6. Call `optimizer.step()` to apply gradient update operation.’
+Salah satu fitur esensial dari PyTorch adalah autograd. Sebelum, kita masuk ke dalam penjelasan mengenai training, kita perlu mengerti tugas dari autograd. Autograd adalah sebuah package yang menyediakan operasi diferensial otomatis pada Tensors. Framework ini secara otomatis digunakan untuk membangun graf komputasional yang diperlukan saat backpropagation.
 
-We can see that the points above are coded in this below training script that we will use later for our finetuning.
+Proses fine-tuning dilakukan dalam beberapa tahap:
+Definisikan optimizer `Adam` dengan learning rate yang kecil, biasanya dibawah `1e-3`
+Panggil `model.train()` untuk mengaktifkan layer regularisasi dropout pada model
+Panggil `torch.set_grad_enabled(True)` untuk mengaktifkan komputasi dengan autograd
+Iterasi objek data loader `train_loader` untuk mengambil `batch_data` dan operkan pada fungsi forward `forward_sequence_classification` in the model.
+Hitung gradien secara otomatis dengan memanggil fungsi `loss.backward(). Fungsi ini adalah fungsi turunan dari autograd package.
+Melakukan perhitungan gradien dengan memanggil `optimizer.step()`
+
+Kita dapat melihat bahwa poin-poin diatas dituliskan dalam skrip latihan di bawah ini yang nantinya akan kita gunakan untuk melakukan fine-tuning model.
+
 
 ```python
 optimizer = optim.Adam(model.parameters(), lr=3e-6)
@@ -329,16 +332,16 @@ for epoch in range(n_epochs):
         total_train_loss/(i+1), metrics_to_string(metrics), get_lr(optimizer)))
 ```
 
-The training script above uses the `forward_sequence_classification` function, as the forward function, and following is the snippet of the important parts of  `forward_sequence_classification` function.
+Skrip latihan di atas menggunakan fungsi `forward_sequence_classification` sebagai fungsi forward model. Berikut ini adalah potongan kode berisi bagian-bagian penting dari fungsi `forward_sequence_classification`.
 
 ```python
 def forward_sequence_classification(model, batch_data, i2w, is_test=False, device='cpu', **kwargs):
     …
     if device == "cuda":
-    	subword_batch = subword_batch.cuda()
+        subword_batch = subword_batch.cuda()
         mask_batch = mask_batch.cuda()
         token_type_batch = token_type_batch.cuda() if token_type_batch is not None else None
-    	label_batch = label_batch.cuda()
+        label_batch = label_batch.cuda()
     
     # Forward model
     outputs = model(subword_batch, attention_mask=mask_batch, token_type_ids = token_type_batch, labels=label_batch)
@@ -347,97 +350,29 @@ def forward_sequence_classification(model, batch_data, i2w, is_test=False, devic
     return loss, list_hyp, list_label
 ```
 
-In both the training script and forward function above we leverage some of the pytorch capabilities, such as the easiness of switching the computation to CPU or GPU, the flexibilities of defining the loss function and computing the loss, and also the hassle-free gradient update by leveraging the autograd package to do the optimization and back propagation. Let’s add some more detail into the capabilities we are leveraging on.
-
-#### Training Step
-
-Here we are going to train (fine-tune) the indobert-base-p1 model for XXXX task.
-
-```python
-def train(model, train_loader, valid_loader, optimizer, forward_fn, metrics_fn, valid_criterion, i2w, n_epochs, evaluate_every=1, early_stop=3, step_size=1, gamma=0.5, model_dir="", exp_id=None):
-    scheduler = StepLR(optimizer, step_size=step_size, gamma=gamma)
-
-    best_val_metric = -100
-    count_stop = 0
-
-    for epoch in range(n_epochs):
-        model.train()
-        total_train_loss = 0
-        list_hyp, list_label = [], []
-        
-        train_pbar = tqdm(iter(train_loader), leave=True, total=len(train_loader))
-        for i, batch_data in enumerate(train_pbar):
-            loss, batch_hyp, batch_label = forward_fn(model, batch_data[:-1], i2w=i2w, device=args['device'])
-
-            optimizer.zero_grad()
-            if args['fp16']:
-                with amp.scale_loss(loss, optimizer) as scaled_loss:
-                    scaled_loss.backward()
-                torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args['max_norm'])
-            else:
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), args['max_norm'])
-            optimizer.step()
-
-            tr_loss = loss.item()
-            total_train_loss = total_train_loss + tr_loss
-
-            # Calculate metrics
-            list_hyp += batch_hyp
-            list_label += batch_label
-            
-            train_pbar.set_description("(Epoch {}) TRAIN LOSS:{:.4f} LR:{:.8f}".format((epoch+1),
-                total_train_loss/(i+1), get_lr(args, optimizer)))
-                        
-        metrics = metrics_fn(list_hyp, list_label)
-        print("(Epoch {}) TRAIN LOSS:{:.4f} {} LR:{:.8f}".format((epoch+1),
-            total_train_loss/(i+1), metrics_to_string(metrics), get_lr(args, optimizer)))
-        
-        # Decay Learning Rate
-        scheduler.step()
-
-        # evaluate
-        if ((epoch+1) % evaluate_every) == 0:
-            val_loss, val_metrics = evaluate(model, valid_loader, forward_fn, metrics_fn, i2w, is_test=False)
-
-            # Early stopping
-            val_metric = val_metrics[valid_criterion]
-            if best_val_metric < val_metric:
-                best_val_metric = val_metric
-                # save model
-                if exp_id is not None:
-                    torch.save(model.state_dict(), model_dir + "/best_model_" + str(exp_id) + ".th")
-                else:
-                    torch.save(model.state_dict(), model_dir + "/best_model.th")
-                count_stop = 0
-            else:
-                count_stop += 1
-                print("count stop:", count_stop)
-                if count_stop == early_stop:
-                    break
-```
+Pada skrip latihan dan fungsi forward diatas, kita menggunakan berbagai fitur PyTorch, seperti kemudahan untuk memindahkan tensor dari CPU ke GPU, fleksibilitas untuk mendefinisikan fungsi loss beserta perhitungan loss, dan juga kemudahan perhitungan gradien dan optimisasi model dengan menggunakan modul autograd dan optimizer. Ayo kita lihat beberapa informasi detail terkait kapabilitas yang telah kita gunakan.
 
 ##### CPU vs CUDA
-```python
+```
 model = model.cuda()
 ```
 
-Training a million parameterized models like BERT on the CPU will take a vast amount of time. The linear algebra operations are done in parallel on the GPU and therefore you can achieve around 100x faster in training time. To cater for this need, PyTorch has prepared an easy way for us to move our tensor data typed variable to be computed either in CPU or GPU. This is done by accessing the method `.cuda()` or `.cpu()` in every tensor instantiated class and also the model, to move an object either to GPU memory from CPU memory, or vice versa.
+Melatih sebuah model yang memiliki lebih dari satu juta parameter seperti BERT memerlukan waktu berbulan-bulan. Operasi training ini dapat dijalankan secara paralel pada GPU hingga 100x lebih cepat. Untuk memenuhi kebutuhan ini, PyTorch telah menyiapkan cara mudah untuk kita memindahkan variabel tipe data tensor kami untuk dihitung (dan diakses) baik di CPU atau GPU. Ini dilakukan dengan memanggil metode `.cuda ()` atau `.cpu ()` di setiap object dari kelas `tensor` dan juga pada model, untuk memindahkan objek tersebut ke memori GPU dari memori CPU, atau sebaliknya.
 
-##### Loss Function
+##### Fungsi Loss
 
 ```python
-loss_fct = CrossEntropyLoss()
-total_loss = 0
-for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
-    label = labels[:,i]
-    loss = loss_fct(logit.view(-1, num_label), label.view(-1))
-    total_loss += loss
+    loss_fct = CrossEntropyLoss()
+    total_loss = 0
+    for i, (logit, num_label) in enumerate(zip(logits, self.num_labels)):
+        label = labels[:,i]
+        loss = loss_fct(logit.view(-1, num_label), label.view(-1))
+        total_loss += loss
 ```
 
-In PyTorch, we can build our own loss function or use loss function provided by the pytorch package. Building custom loss functions in Pytorch is not that hard actually, we just need to define a function that compares the output logits tensor with the label tensor and with that our loss function can have the same properties as the provided loss functions (automatically computed gradients, etc.). In our example here, we are using a provided loss function called `CrossEntropyLoss()`. Cross entropy loss is calculated by comparing how well the probability distribution output by Softmax matches the one-hot-encoded ground truth label of the data. We use this loss function in our sentiment analysis case because this loss fits perfectly to our needs as this is quantifying the model's capability to distinguish the true sentiment from the possibility of the sentiments available in our data.
+Dengan framework PyTorch, kita dapat menggunakan fungsi loss buatan sendiri atau menggunakan fungsi loss yang disediakan didalam framework PyTorch. Membangun fungsi loss buatan sendiri di Pytorch tidaklah sulit, kita hanya perlu mendefinisikan fungsi yang membandingkan tensor logits keluaran dari model with tensor label dan dengan itu fungsi loss yang telah dibangun langsung memiliki  kapabilitas yang sama seperti fungsi loss bawaan PyTorch (komputasi gradien otomatis, dll.). Dalam contoh di tutorial ini, kita menggunakan fungsi loss bawaan PyTorch yaitu CrossEntropyLoss(). Cross entropy loss dihitung dengan membandingkan seberapa sesuai distribusi probabilitas keluaran dari fungsi softmax  dengan pengkodean one-hot dari label data yang seharusnya. Penggunaan fungsi loss ini sangatlah tepat dalam kasus sentiment analisis kita, karena fungsi loss ini mengkuantifikasi kemampuan model untuk membedakan setiap kemungkinan sentimen yang ada.
 
-##### Optimizer and Back Propagation
+##### Optimizer dan Back Propagation
 
 ```python
 optimizer = optim.Adam(model.parameters(), lr=5e-6)
@@ -447,19 +382,21 @@ loss.backward()
 optimizer.step()
 ```
 
-Initializing the optimizer needs us to explicitly tell it what parameters (tensors) of the model it should be updating. To do a back propagation, we only need to call `.backward()` on the loss Variable as this will start a process of backpropagation at the end loss and goes through all of its parents all the way to model inputs and output the gradient needed for backpropagation. Behind the curtain, while you’re called `loss.backward()`, gradients are "stored" by the tensors themselves (they have a grad and a requires_grad attributes). This is why, to do the backpropagation, optimizers don’t need to know anything about your loss. To update the gradient for all tensors in the model, we need to zero out all the previous grad from previous training by calling `optimizer.zero_grad()`, and then we need to call `optimizer.step()` as this will make the optimizer iterate over all parameters (tensors) it is supposed to update (requires_grad =True) and use their internally stored grad to update their values.
+Menginisialisasi `optimizer` mengharuskan kita untuk mengetahui parameters model mana saja yang akan diupdate. Untuk melakukan sebuah operasi back propagation, kita perlu memanggil fungsi `.backward()` pada loss yang dihitung berdasarkan input dan output. Di balik fungsi tersebut, gradien yaitu hasil komputasi dari `backward` akan disimpan pada parameter `grad` jika atribut `requires_grad` sama dengan True. Setiap kali kita menghitung gradien, kita perlu mereset gradien dengan memanggil `optimizer.zero_grad()` dan fungsi `optimizer.step()` akan mengupdate model.
 
-#### Evaluation Step
+<div id="evaluation-phase"></div>
+#### Fase Evaluasi
 
-At each of the epoch training, we will evaluate the trained model performance. In the above finetuning training tutorial, we set the `set_grad_enabled` parameter as True, allowing all the gradients computed automatically when we call `loss.backward()`. In this evaluation phase, we don’t need that capability to be activated, and we don’t want to update any gradient parameters in any of the tensors. thus we set the `set_grad_enabled` parameter as False.
+Di setiap pelatihan epoch, kita akan mengevaluasi performa model yang dilatih. Dalam tutorial pelatihan finetuning di atas, kita menyetel parameter `set_grad_enabled` sebagai True, yang memungkinkan semua gradien dihitung secara otomatis saat kita memanggil `loss.backward()`. Dalam fase evaluasi ini, kita tidak memerlukan parameter tersebut untuk diaktifkan, dan kita tidak ingin memperbarui parameter gradien apa pun di tensor mana pun. jadi kami menyetel parameter `set_grad_enabled` sebagai False.
 
-The fine tuning validation is done in these steps:
-Enable the autograd computation by calling `torch.set_grad_enabled(True)`.
-Iterate our data loader `valid_loader` to get `batch_data`.
-Pass it to the same forward function `forward_sequence_classification` in the model to output the model prediction.
-Evaluate the predictions using sklearn functions that are provided in the `document_sentiment_metrics_fn` script, to output the accuracy, F1 score, recall, and precision.
+Validasi fine tuning dilakukan dalam langkah-langkah berikut:
+Aktifkan komputasi autograd dengan memanggil `torch.set_grad_enabled (True)`.
+Iterasi data loader kita `valid_loader` untuk mendapatkan` batch_data`.
+Teruskan ke fungsi forward yang sama `forward_sequence_classification` dalam model untuk mengeluarkan prediksi model.
+Evaluasi prediksi menggunakan fungsi sklearn yang disediakan dalam skrip `document_sentiment_metrics_fn`, untuk menghasilkan akurasi, skor F1, recall, dan precision.
 
-We can see that the points above are coded in this below evaluation script that we will use for our fine tuning evaluation.
+Kita dapat melihat bahwa poin-poin di atas dikodekan dalam skrip evaluasi di bawah ini yang akan kita gunakan untuk mengevaluasi pelatihan fine-tuning kita.
+
 
 ```python
 # Evaluate on validation
@@ -490,7 +427,7 @@ print("(Epoch {}) VALID LOSS:{:.4f} {}".format((epoch+1),
     total_loss/(i+1), metrics_to_string(metrics)))
 ```
 
-The evaluation script above uses the `document_sentiment_metrics_fn` function to do the mentioned accuracy, F1 score, recall, and precision metrics calculations, and the following is the snippet of it.
+Skrip evaluasi di atas menggunakan fungsi `document_sentiment_metrics_fn` untuk melakukan penghitungan akurasi, skor F1, recall, dan metrik precision, dan berikut ini cuplikan kodenya.
 
 ```python
 def document_sentiment_metrics_fn(list_hyp, list_label):
@@ -502,11 +439,18 @@ def document_sentiment_metrics_fn(list_hyp, list_label):
     return metrics
 ```
 
-This evaluation then concludes the whole modelling process. We hope you get a good result on your experiment and we hope you enjoyed our short but fun tutorial. If you have finished this tutorial, post your experiences and results in your facebook story. Inspire others to do the same by sharing this tutorial to other deep learning and NLP enthusiasts around the world!
+Dengan evaluasi ini, kita menyimpulkan keseluruhan proses pemodelan kita pada in IndoTutorial ini. Kami berharap Anda mendapatkan hasil yang bagus pada percobaan Anda dan kami harap Anda menikmati tutorial singkat tapi menyenangkan yang kami buat ini. Jika Anda telah menyelesaikan tutorial ini, posting pengalaman dan hasil anda di story facebook anda dan ajak dan berikan inspirasi kepada orang lain untuk melakukan hal yang sama dengan membagikan tutorial ini kepada penggemar deep learning dan NLP di seluruh Indonesia!
 
 <div id="resources"></div>
+<<<<<<< HEAD
 #### Additional Resources
 
 - [Github](https://github.com/indobenchmark/indonlu)
 - [HuggingFace portal](https://huggingface.co/indobenchmark)
 - [Homepage](https://www.indobenchmark.com/)
+=======
+#### Sumber Tambahan
+- Github: https://github.com/indobenchmark/indonlu
+- HuggingFace portal: https://huggingface.co/indobenchmark
+- Homepage: https://www.indobenchmark.com/
+>>>>>>> a9beca2461f212aac3411947084316e48d9badaf
